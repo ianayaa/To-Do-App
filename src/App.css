@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+@import "~@fortawesome/fontawesome-free/css/all.css";
+
+/* importa los archivos css */
+@import "./styles/home.css";
+@import "./styles/login.css";
+@import "./styles/sidebar.css";
+@import "./styles/taskCard.css";
+@import "./styles/taskSummary.css";
+
+body {
+  font-family: "Montserrat", sans-serif;
+}
+
+.task-form .custom-input {
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.task-form .custom-input:focus {
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #6c757d;
+  background-color: transparent;
+}
+
+.task-form .custom-button {
+  margin-right: 10px;
+  border: 1px solid #aaaaaa;
+}
+
+.task-form .custom-select {
+  margin-right: 10px;
+  color: white;
+  border: none;
+  background-color: #6c757d; /* Color gris para el combobox */
+  appearance: none;
+}
