@@ -109,7 +109,7 @@ const AppLogin = () => {
             <form>
               <h1>Iniciar Sesión</h1>
               {message && (
-                  <p className={`message ${message === "*Por favor, completa todos los campos." ? "error-message" : ""}`}>
+                  <p className={`message ${message.includes("auth/unauthorized-domain") ? "error-message" : ""}`}>
                     {message}
                   </p>
               )}
@@ -151,7 +151,7 @@ const AppLogin = () => {
             <form>
               <h1>Crear Cuenta</h1>
               {message && (
-                  <p className={`message ${message === "*Por favor, completa todos los campos." ? "error-message" : ""}`}>
+                  <p className={`message ${message.includes("auth/unauthorized-domain") ? "error-message" : ""}`}>
                     {message}
                   </p>
               )}
