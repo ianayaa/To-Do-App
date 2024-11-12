@@ -13,14 +13,6 @@
   padding: 0;
 }
 
-.main-content {
-  padding: 30px;
-  background-color: #f9f7f3;
-  flex-grow: 1;
-  border-radius: 20px;
-  overflow: auto;
-}
-
 /* Contenido principal */
 .main-content {
   padding: 30px;
@@ -28,6 +20,7 @@
   flex-grow: 1;
   border-radius: 20px;
   overflow: auto;
+  display: flex;
 }
 
 .main-content header {

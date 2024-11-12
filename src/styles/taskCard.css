@@ -1,40 +1,7 @@
-.taskCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.taskCard:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.taskInfo {
-  flex: 1;
-}
-
-.taskTitle {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.taskDueDate {
-  font-size: 0.9rem;
-  color: #888;
-}
-
 .statusIcon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 20%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,4 +21,11 @@
 .statusIcon.overdue {
   background-color: #f44336;
   color: #fff;
+}
+
+.progress-component:hover {
+  background-color: #ffc24714; /* Un ligero color de fondo al hacer hover */
+  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+  border: 2px solid #ffc10744;
+  border-radius: 12px;
 }

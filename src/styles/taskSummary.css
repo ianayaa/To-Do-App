@@ -1,16 +1,16 @@
 /* Contenedor principal de los resúmenes de tareas */
 .taskSummaryContainer {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   margin: 20px 0;
-  padding: 0 16px;
+  padding: 0 0px;
   justify-content: center;
 }
 
 /* Tarjeta de cada resumen */
 .taskSummaryCard {
   flex: 1;
-  padding: 20px;
+  padding: 12px;
   border-radius: 8px;
   text-align: center;
   background-color: #f7f7f7;
@@ -24,23 +24,23 @@
 
 /* Colores personalizados para cada tipo de resumen */
 .completed {
-  background-color: #e8f5e9;
-  border: 1px solid #a5d6a7;
+  background-color: #d5f3d835;
+  border: 1px solid #0bf012;
 }
 
 .pending {
-  background-color: #fff3e0;
-  border: 1px solid #ffcc80;
+  background-color: rgba(255, 243, 224, 0.233);
+  border: 1px solid #ffc247;
 }
 
 .overdue {
-  background-color: #ffebee;
-  border: 1px solid #ef9a9a;
+  background-color: rgba(255, 235, 238, 0.412);
+  border: 1px solid #ce2121;
 }
 
 /* Texto de conteo y título */
 .taskCount {
-  font-size: 2.4rem;
+  font-size: 1.7rem;
   font-weight: bold;
   color: #333;
 }

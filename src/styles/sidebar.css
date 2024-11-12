@@ -3,14 +3,51 @@
   background-color: #25283d;
   color: white;
   padding: 30px;
-  width:300px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   height: 100vh;
-
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
 }
 
+/* Ocultar sidebar solo en pantallas móviles cuando está cerrado */
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Botón de menú (hamburguesa) solo visible en móviles */
+.menu-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1100;
+  background-color: #25283d;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: none;
+}
+
+/* Mostrar botón de menú solo en móviles */
+@media (max-width: 768px) {
+  .menu-button {
+    display: block;
+  }
+
+  .sidebar {
+    width: 250px;
+  }
+}
+
+/* Enlace y estilos activos */
 .sidebar ul {
   list-style: none;
   padding: 0;
@@ -19,29 +56,6 @@
 
 .sidebar li {
   margin-bottom: 20px;
-}
-
-/* Sección Actual */
-.sidebar ul li {
-  border-radius: 8px; /* Esquinas redondeadas */
-  transition: background-color 0.3s; /* Transición suave */
-  padding: 2px 6px; /* Espaciado interno (vertical, horizontal) */
-}
-
-.sidebar ul li.active {
-  background-color: rgba(255, 194, 71, 0.3); /* Fondo traslúcido con color ffc247 */
-  font-weight: bold; /* Estilo de texto */
-  border: 2px solid #ffc247; /* Borde amarillo */
-}
-
-/* Cambiar color del texto a negro al hacer hover */
-.sidebar ul li.active:hover {
-  color: black; /* Color del texto */
-}
-
-.sidebar ul li:hover {
-  background-color: rgba(204, 204, 204, 0.5); /* Fondo traslúcido al hacer hover */
-  border: 2px solid #ffc247; /* Borde amarillo */
 }
 
 .sidebar a {
@@ -56,57 +70,35 @@
   margin-right: 10px;
 }
 
+.sidebar ul li.active {
+  background-color: rgba(255, 194, 71, 0.3);
+  font-weight: bold;
+  border: 2px solid #ffc247;
+}
+
 .sidebar a:hover {
   color: #ffc247;
 }
 
-/* User Info Section */
+/* Información del usuario */
 .user-info {
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: #25283d;
-  margin-bottom: 20px; /* Espaciado inferior */
-  white-space: nowrap; /* Evitar que el texto haga un salto de línea */
+  margin-bottom: 20px;
 }
 
-.user-info div {
-  padding: 5px; /* Espaciado interno para los elementos dentro del contenedor */
-  border-radius: 8px; /* Redondear elementos internos */
-  transition: background-color 0.3s ease; /* Transición suave para el hover */
-}
-
-.user-info div:hover {
-  background-color: #ffc247;
-}
-
-/* Ajustar tamaño de la imagen de perfil y margen */
-.sidebar .user-info .user-image {
-  width: 40px; /* Tamaño de la imagen */
-  height: 40px; /* Tamaño de la imagen */
+.user-image {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 35px; /* Espacio entre la imagen y el nombre */
-}
-
-/* Ajustar el tamaño de los iconos para que coincidan */
-.sidebar i {
-  font-size: 20px; /* Tamaño de los iconos */
+  margin-right: 15px;
 }
 
 .user-name {
-  margin-right: 35px; /* Espacio entre nombre y campana */
-  white-space: nowrap; /* Evitar que el texto haga un salto de línea */
+  white-space: nowrap;
 }
-
-/* Estilo para la campana de notificaciones */
-.user-info i.fas.fa-bell {
-  margin-left: 10px; /* Espacio a la izquierda de la campana */
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    padding: 20px;
-    text-align: center;
-  }
+.MuiDrawer-paper {
+  background-color: #25283d;
+  color: white;
 }

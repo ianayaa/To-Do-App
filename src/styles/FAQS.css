@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: #fdfbf7;
+  color: #1d2142;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.faq-container h2 {
+  font-family: "Montserrat", sans-serif;
+  color: #1d2142;
+  font-size: 1.9em;
+  margin-bottom: 20px;
+  font-weight: bolder;
+}
+
+.faq-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact {
+  text-align: left;
+  justify-content: space-between;
+  margin-top: 10%; /* Puedes ajustar el valor según sea necesario */
+  font-size: 0.9em;
+  color: #333;
+  padding-top: 10px; /* Añade algo de espacio encima si es necesario */
+}
+
+.faq-image {
+  max-width: 50%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.faq-list {
+  list-style: none;
+  text-align: left;
+  width: 100%;
+  max-width: 600px;
+  color: #1d2142;
+  margin-bottom: 20px;
+}
+
+/* Estilos previos... */
+
+.faq-list li {
+  margin-bottom: 15px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.respuesta {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  font-size: 0.9em;
+  color: #333;
+  margin-top: 5px;
+}
+
+.faq-list li.active .respuesta {
+  max-height: 150px; /* Ajusta el valor según la altura esperada de la respuesta */
+}
+
+/* Estilo para resaltar la pregunta seleccionada */
+.faq-list li.active strong {
+  color: #ffce47;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .content {
+    padding: 20px;
+  }
+  .faq-list {
+    max-width: 100%;
+  }
+}

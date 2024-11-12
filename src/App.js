@@ -11,6 +11,7 @@ import Calendar from "./pages/calendar";
 import ConfiguracionPerfil from "./pages/ConfiguracionPerfil"; // Nueva página de configuración de perfil
 import BlankLayout from "./layout/blankLayout";
 import MainLayout from "./layout/mainLayout";
+import FAQ from "./pages/FAQ";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./config/firebase"; // Autenticación de Firebase
 
@@ -30,18 +31,19 @@ const PrivateRoute = ({ element }) => {
 
 const App = () => {
   return (
-      <Router>
-        <Routes>
-          <Route element={<BlankLayout />}>
-            <Route path="/" element={<AppLogin />} />
-          </Route>
-          <Route element={<PrivateRoute element={<MainLayout />} />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/configuracion" element={<ConfiguracionPerfil />} />
-          </Route>
-        </Routes>
-      </Router>
+    <Router>
+      <Routes>
+        <Route element={<BlankLayout />}>
+          <Route path="/" element={<AppLogin />} />
+        </Route>
+        <Route element={<PrivateRoute element={<MainLayout />} />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/configuracion" element={<ConfiguracionPerfil />} />
+          <Route path="/soporte" element={<FAQ />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 };
 
