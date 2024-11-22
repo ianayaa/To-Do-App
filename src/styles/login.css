@@ -31,7 +31,7 @@
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 20px 0 30px;
-  color: #ffffff;
+  color: #25283d;
 }
 
 .login-container span {
@@ -110,9 +110,30 @@
 }
 
 .message {
-  color: #e74c3c; /* Mantener el color para el texto de error */
   font-size: 14px;
   margin-top: 5px;
+  color: #ff0000;
+  animation: fadeIn 0.3s ease-in;
+  transform-origin: top;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message {
+  color: #ff0000 !important;
+}
+
+.message.error-message {
+  color: #ff0000 !important;
 }
 
 .container {
@@ -202,6 +223,15 @@
 
 .container.right-panel-active .overlay {
   transform: translateX(50%);
+}
+
+.overlay p {
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 100;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin: 20px 0 30px;
 }
 
 .overlay-panel {
@@ -300,10 +330,6 @@
   border: none !important;
 }
 
-.message.error-message {
-  color: #ff0000;
-}
-
 .input {
   width: 100%;
   padding: 10px;
@@ -337,8 +363,48 @@
   border: 1px solid red;
 }
 
-.error-message {
-  color: red;
+.password-strength {
+  width: 100%;
+  height: 4px;
+  margin-top: 5px;
+  border-radius: 2px;
+  background-color: #eee;
+  position: relative;
+}
+
+.password-strength-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.strength-weak { width: 33.33%; background-color: #ff4d4d; }
+.strength-medium { width: 66.66%; background-color: #ffd700; }
+.strength-strong { width: 100%; background-color: #2ecc71; }
+
+.loading {
+  position: relative;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top: 2px solid transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
 }
 
 /* Dark Theme */

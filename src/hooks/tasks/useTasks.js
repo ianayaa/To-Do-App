@@ -16,6 +16,8 @@ const useTasks = (db, user) => {
       return;
     }
 
+    console.log('Iniciando suscripción a tareas para usuario:', user.uid);
+
     // Crear una consulta
     const q = query(
         collection(db, "tasks"),
@@ -26,48 +28,60 @@ const useTasks = (db, user) => {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const fetchedTasks = [];
       querySnapshot.forEach((doc) => {
-        fetchedTasks.push({ id: doc.id, ...doc.data() });
+        // Validar el documento
+        if (!doc.exists()) {
+          console.error('Documento no existe:', doc.id);
+          return;
+        }
+
+        // Obtener y validar los datos
+        const taskData = doc.data();
+        if (!taskData) {
+          console.error('Datos inválidos para el documento:', doc.id);
+          return;
+        }
+
+        // Crear objeto de tarea con validación de campos
+        const task = {
+          id: doc.id,
+          descripcion: taskData.descripcion || '',
+          titulo: taskData.titulo || '',
+          estado: taskData.estado || 'Pendiente',
+          tags: Array.isArray(taskData.tags) ? taskData.tags : [],
+          dueDate: taskData.dueDate || null,
+          user_id: taskData.user_id,
+        };
+
+        console.log('Tarea procesada:', task);
+        fetchedTasks.push(task);
       });
 
+      console.log('Total de tareas obtenidas:', fetchedTasks.length);
       setTasks(fetchedTasks);
 
       // Actualiza los contadores
-      const completed = fetchedTasks.filter(
-          (task) => task.estado === "Completada"
-      );
-      setCompletedCount(completed.length);
-
-      const overdue = fetchedTasks.filter((task) => {
+      const completed = fetchedTasks.filter(task => task.estado === "Completada");
+      const overdue = fetchedTasks.filter(task => {
         const dueDate = task.dueDate?.toDate();
         return task.estado === "Pendiente" && dueDate && dueDate < new Date();
       });
-      setOverdueCount(overdue.length);
-
-      const pending = fetchedTasks.filter((task) => {
+      const pending = fetchedTasks.filter(task => {
         const dueDate = task.dueDate?.toDate();
-        return (
-            task.estado === "Pendiente" && (!dueDate || dueDate >= new Date())
-        );
+        return task.estado === "Pendiente" && (!dueDate || dueDate >= new Date());
       });
+
+      setCompletedCount(completed.length);
+      setOverdueCount(overdue.length);
       setPendingCount(pending.length);
     });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [db, user?.uid]);
+    return () => {
+      console.log('Limpiando suscripción a tareas');
+      unsubscribe();
+    };
+  }, [db, user]);
 
-  // Función para añadir una nueva tarea directamente al estado
-  const addTaskToList = (newTask) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
-  };
-
-  return {
-    tasks,
-    completedCount,
-    pendingCount,
-    overdueCount,
-    addTaskToList, // Añadir el callback
-  };
+  return { tasks, completedCount, pendingCount, overdueCount };
 };
 
 export default useTasks;

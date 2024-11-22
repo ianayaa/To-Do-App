@@ -26,10 +26,13 @@ const AddTask = ({ addTask, closeAddTask }) => {
       fechaCreacion: new Date(),
       dueDate: taskDate,
       complete: false,
-      tags: selectedTags ? selectedTags.map((label) => label.value) : [], // Verifica que selectedTags no sea undefined
+      tags: selectedTags && selectedTags.length > 0 
+        ? selectedTags.map(tag => tag.value) 
+        : []
     };
 
-    addTask(taskWithTags, selectedTags); // Pasa las etiquetas seleccionadas al hook
+    console.log('Task a guardar con tags:', taskWithTags);
+    addTask(taskWithTags); 
     setTaskName("");
     setTaskDescription("");
     setSelectedTags([]); // Limpiar las etiquetas después de agregar la tarea

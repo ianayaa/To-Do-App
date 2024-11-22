@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import useTasks from "../hooks/tasks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -34,15 +34,43 @@ const PageCalendar = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [view, setView] = useState("month");
 
-  const events = tasks.map((task) => ({
-    id: task.id,
-    title: task.descripcion,
-    allDay: true,
-    start: new Date(task.dueDate.toDate()),
-    end: new Date(task.dueDate.toDate()),
-    estado: task.estado,
-    etiquetas: task.etiquetas || [],
-  }));
+  useEffect(() => {
+    console.log('Tasks actualizadas:', tasks);
+  }, [tasks]);
+
+  // Convertir las tareas a eventos del calendario
+  const events = tasks.map((task) => {
+    console.log('Procesando tarea:', task);
+    if (!task || !task.id) {
+      console.error('Tarea inválida:', task);
+      return null;
+    }
+
+    const dueDate = task.dueDate?.toDate();
+    if (!dueDate) {
+      console.error('Fecha inválida para la tarea:', task);
+      return null;
+    }
+
+    // Crear una copia segura de la tarea
+    const taskCopy = {
+      id: task.id,
+      descripcion: task.descripcion || '',
+      titulo: task.titulo || '',
+      estado: task.estado || 'Pendiente',
+      etiquetas: task.etiquetas || [],
+      dueDate: task.dueDate,
+      user_id: task.user_id,
+    };
+
+    return {
+      ...taskCopy,
+      allDay: true,
+      title: taskCopy.descripcion || '',
+      start: dueDate,
+      end: dueDate,
+    };
+  }).filter(Boolean); // Eliminar eventos nulos
 
   const eventColors = (event) => {
     let style = {
@@ -157,8 +185,25 @@ const PageCalendar = () => {
         style={{ height: "100%" }}
         eventPropGetter={eventColors}
         onSelectEvent={(event) => {
+          console.log('Evento seleccionado:', event);
+          console.log('ID del evento:', event.id);
+          console.log('Lista de tareas actual:', tasks);
+          
+          // Buscar la tarea original para asegurarnos de tener todos los datos correctos
+          const originalTask = tasks.find(t => {
+            console.log('Comparando con tarea:', t);
+            return t.id === event.id;
+          });
+          
+          if (originalTask) {
+            console.log('Tarea original encontrada:', originalTask);
+            setSelectedTask(originalTask);
+          } else {
+            console.error('No se encontró la tarea original para el ID:', event.id);
+            setSelectedTask(null);
+            return; // No abrir el diálogo si no hay tarea
+          }
           setOpen(true);
-          setSelectedTask(event);
         }}
         components={{
           toolbar: CustomToolbar,
@@ -179,9 +224,13 @@ const PageCalendar = () => {
         }}
       />
       <TaskDetailDialog
-        open={open}
-        handleClose={() => setOpen(false)}
+        open={open && selectedTask !== null}
+        handleClose={() => {
+          setOpen(false);
+          setSelectedTask(null);
+        }}
         task={selectedTask}
+        db={db}
       />
     </Paper>
   );

@@ -3,15 +3,15 @@ import { useCallback } from "react";
 
 const useAddTasks = (db, user) => {
   const addTask = useCallback(
-    async (newTask, selectedTags) => {
+    async (newTask) => {
       if (!user?.uid) return;
 
-      // Asegúrate de que el campo tags contiene solo los valores de las etiquetas seleccionadas
+      // Asegúrate de que el campo tags sea siempre un array
       const taskWithUserId = {
         ...newTask,
         user_id: user.uid,
         createdAt: serverTimestamp(),
-        tags: selectedTags.map((tag) => tag.value), // Asegurarnos de que solo guardamos los valores
+        tags: Array.isArray(newTask.tags) ? newTask.tags : [] // Aseguramos que tags sea un array
       };
 
       try {

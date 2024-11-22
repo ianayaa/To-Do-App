@@ -37,6 +37,10 @@ import { Timestamp } from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import SchoolIcon from '@mui/icons-material/School';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -83,19 +87,33 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
     };
 
     const handleDelete = async () => {
-        if (!task.id) {
-            setSnackbarMessage("ID de tarea no válido");
-            setSnackbarOpen(true);
-            return;
-        }
-
         try {
+            console.log('Intentando eliminar tarea:', task);
+            
+            if (!task) {
+                throw new Error("No se ha seleccionado ninguna tarea");
+            }
+            
+            // Verificar que task.id sea un string válido
+            if (!task.id || typeof task.id !== 'string') {
+                console.error('ID de tarea inválido:', task.id);
+                throw new Error("La tarea no tiene un ID válido");
+            }
+
+            if (!db) {
+                throw new Error("No hay conexión con la base de datos");
+            }
+
+            // Intentar eliminar la tarea
+            console.log('Eliminando tarea con ID:', task.id);
             await deleteTaskHook(task.id);
+            
+            // Si la eliminación fue exitosa
             setDeleteButtonState('success');
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
             
-            // Esperar un momento antes de cerrar para mostrar la animación
+            // Cerrar el diálogo después de un breve delay
             setTimeout(() => {
                 handleClose();
                 if (deleteTask) {
@@ -104,7 +122,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
             }, 1500);
         } catch (err) {
             console.error("Error al eliminar la tarea:", err);
-            setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea.");
+            setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea");
             setSnackbarOpen(true);
             setDeleteButtonState('initial');
         }
@@ -133,25 +151,39 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
             >
                 <DialogActions
                     sx={{
-                        backgroundColor: "#FFFFFF", // Color blanco para toda la barra
-                        padding: "8px 16px", // Espaciado
+                        backgroundColor: "#f8f9fa",
+                        padding: "12px 24px",
                         display: "flex",
-                        justifyContent: "space-between", // Asegura la distribución correcta
+                        justifyContent: "space-between",
                         alignItems: "center",
+                        borderBottom: "1px solid #e9ecef",
                     }}
                 >
-                    <Typography variant="h6" sx={{ fontWeight: "Light" }}>
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            fontWeight: 500,
+                            color: "#2c3e50",
+                            fontSize: "1.1rem",
+                            letterSpacing: "0.5px"
+                        }}
+                    >
                         Detalles de la tarea:
                     </Typography>
-                    <Button
+                    <IconButton
                         onClick={handleClose}
-                        startIcon={<FontAwesomeIcon icon={faXmark} />}
-                        aria-label="Cerrar diálogo"
+                        size="small"
                         sx={{
-                            color: "text.secondary",
-                            alignSelf: "flex-end",
+                            color: "#6c757d",
+                            '&:hover': {
+                                color: "#dc3545",
+                                backgroundColor: "rgba(220, 53, 69, 0.1)",
+                            },
+                            transition: "all 0.2s ease-in-out",
                         }}
-                    />
+                    >
+                        <FontAwesomeIcon icon={faXmark} />
+                    </IconButton>
                 </DialogActions>
 
                 <DialogTitle>
@@ -170,41 +202,40 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                     </Box>
                 </DialogTitle>
 
-                <DialogContent sx={{ display: "flex", p: 2, height: "100%" }}>
+                <DialogContent sx={{ 
+                    display: "flex", 
+                    p: 2, 
+                    height: "100%",
+                    position: "relative"
+                }}>
                     {/* Columna Izquierda */}
                     <Box
                         flex={2}
                         sx={{
                             pr: 2,
                             backgroundColor: "#F9F7F3",
-                            overflowY: "auto",
                             display: "flex",
                             flexDirection: "column",
                             height: "100%",
                             justifyContent: "space-between",
+                            overflowY: "auto"
                         }}
                     >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <FontAwesomeIcon icon={faBars} style={{ color: "#757575" }} />
-                            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                                Descripción:
+                        {/* Contenedor scrolleable para la descripción */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word"
+                                }}
+                            >
+                                {task.descripcion || "Sin descripción"}
                             </Typography>
                         </Box>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                mt: 0.5,
-                                mb: 50,
-                                fontSize: "0.9rem",
-                                lineHeight: 1.4,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            {task.descripcion || "No hay descripción"}
-                        </Typography>
-                        <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
+
+                        {/* Contenedor para los botones */}
+                        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
                             <TextField
                                 fullWidth
                                 variant="outlined"
@@ -251,72 +282,126 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             height: "100%",
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "flex-start",
-                            overflow: "hidden",
+                            position: "relative",
                             borderLeft: "1px solid #d0d0d0",
                         }}
                     >
-                        <Box sx={{ mb: 1 }}>
-                            <Typography variant="body2" color="textSecondary">
-                                Proyecto:
-                            </Typography>
-                            <Typography variant="body1">#Tareas</Typography>
-                        </Box>
-                        <Divider />
-                        <Box sx={{ my: 1 }}>
-                            <Typography variant="body2" color="textSecondary">
-                                Fecha de vencimiento:
-                            </Typography>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <FontAwesomeIcon icon={faCalendarAlt} style={{ color: "#CE2121" }} />
-                                <Typography variant="body1">
-                                    {task.dueDate
-                                        ? task.dueDate.toDate().toLocaleDateString("es-ES", {
-                                            year: "numeric",
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                        : "Sin fecha"}
+                        {/* Contenedor scrolleable para el contenido */}
+                        <Box sx={{ 
+                            overflowY: "auto", 
+                            flex: 1,
+                            pb: "80px" // Espacio para el botón
+                        }}>
+                            <Box sx={{ mb: 1 }}>
+                                <Typography variant="body2" color="textSecondary">
+                                    Proyecto:
                                 </Typography>
+                                <Typography variant="body1">#Tareas</Typography>
                             </Box>
-                        </Box>
-                        <Divider />
-                        <Box sx={{ my: 1 }}>
-                            <Typography variant="body2" color="textSecondary">
-                                Prioridad:
-                            </Typography>
-                            <Typography variant="body1">Media</Typography>
-                        </Box>
-                        <Divider />
-                        <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" color="textSecondary">
-                                Etiquetas:
-                            </Typography>
-                            <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                                {task.tags && task.tags.length > 0 ? (
-                                    task.tags.map((tag, index) => (
-                                        <Chip 
-                                            key={index} 
-                                            label={tag} 
-                                            size="small" 
-                                            color="primary"
-                                            sx={{
-                                                backgroundColor: '#4caf50',
-                                                color: 'white',
-                                                '&:hover': {
-                                                    backgroundColor: '#388e3c'
-                                                }
-                                            }}
-                                        />
-                                    ))
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">
-                                        No hay etiquetas
+                            <Divider />
+                            <Box sx={{ my: 1 }}>
+                                <Typography variant="body2" color="textSecondary">
+                                    Fecha de vencimiento:
+                                </Typography>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <FontAwesomeIcon icon={faCalendarAlt} style={{ color: "#CE2121" }} />
+                                    <Typography variant="body1">
+                                        {task.dueDate
+                                            ? task.dueDate.toDate().toLocaleDateString("es-ES", {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                            })
+                                            : "Sin fecha"}
                                     </Typography>
-                                )}
+                                </Box>
+                            </Box>
+                            <Divider />
+                            <Box sx={{ my: 1 }}>
+                                <Typography variant="body2" color="textSecondary">
+                                    Prioridad:
+                                </Typography>
+                                <Typography variant="body1">Media</Typography>
+                            </Box>
+                            <Divider />
+                            <Box sx={{ mt: 1 }}>
+                                <Typography variant="body2" color="textSecondary">
+                                    Etiquetas:
+                                </Typography>
+                                <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+                                    {task.tags && task.tags.length > 0 ? (
+                                        task.tags.map((tag, index) => {
+                                            const tagConfigs = {
+                                                "Importante": { 
+                                                    color: "#dc3545",
+                                                    icon: <PriorityHighIcon sx={{ fontSize: 20, color: 'white' }} />
+                                                },
+                                                "Urgente": { 
+                                                    color: "#fd7e14",
+                                                    icon: <NotificationsActiveIcon sx={{ fontSize: 20, color: 'white' }} />
+                                                },
+                                                "Escuela": { 
+                                                    color: "#0d6efd",
+                                                    icon: <SchoolIcon sx={{ fontSize: 20, color: 'white' }} />
+                                                },
+                                                "Bajo": { 
+                                                    color: "#198754",
+                                                    icon: <AccessTimeIcon sx={{ fontSize: 20, color: 'white' }} />
+                                                }
+                                            };
+
+                                            const tagConfig = tagConfigs[tag] || { 
+                                                color: "#4caf50",
+                                                icon: <PriorityHighIcon sx={{ fontSize: 20, color: 'white' }} />
+                                            };
+
+                                            return (
+                                                <Chip 
+                                                    key={index} 
+                                                    label={tag}
+                                                    icon={tagConfig.icon}
+                                                    size="small" 
+                                                    sx={{
+                                                        backgroundColor: tagConfig.color,
+                                                        color: 'white',
+                                                        '& .MuiChip-icon': {
+                                                            color: 'white',
+                                                            marginLeft: '5px'
+                                                        },
+                                                        '& .MuiChip-label': {
+                                                            paddingLeft: '8px'
+                                                        },
+                                                        '&:hover': {
+                                                            backgroundColor: tagConfig.color,
+                                                            opacity: 0.8
+                                                        }
+                                                    }}
+                                                />
+                                            );
+                                        })
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary">
+                                            No hay etiquetas
+                                        </Typography>
+                                    )}
+                                </Box>
                             </Box>
                         </Box>
-                        <Box sx={{ mt: 36.5, display: "flex", justifyContent: "left" }}>
+
+                        {/* Botón de eliminar con posición fija */}
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                padding: "16px",
+                                backgroundColor: "#F9F7F3",
+                                borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+                                display: "flex",
+                                justifyContent: "left"
+                            }}
+                        >
                             <Zoom in={true}>
                                 <Button
                                     variant="contained"

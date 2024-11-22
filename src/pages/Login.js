@@ -29,7 +29,25 @@ const AppLogin = () => {
   });
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
+
+  // Función para validar el email
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Función para calcular la fortaleza de la contraseña
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[!@#$%^&*]/.test(password)) strength++;
+    return strength;
+  };
 
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence).then(() => {
@@ -49,52 +67,62 @@ const AppLogin = () => {
 
   const togglePanel = (isActive) => setIsRightPanelActive(isActive);
 
-  const validateFields = () => {
-    const { email, password, name } = credentials;
-    const isValid = email && password && (isRightPanelActive ? name : true);
-    setErrors({
-      email: !email,
-      password: !password,
-      ...(isRightPanelActive && { name: !name }),
-    });
-    if (!isValid) setMessage("*Por favor, completa todos los campos.");
-    return isValid;
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: !value }));
+    
+    if (name === 'password') {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
+    if (name === 'email') {
+      setErrors(prev => ({ ...prev, email: !isValidEmail(value) }));
+    }
+  };
+
+  const validateFields = () => {
+    const { email, password, name } = credentials;
+    const emailValid = isValidEmail(email);
+    const passwordValid = password.length >= 6;
+    const nameValid = !isRightPanelActive || (name && name.length >= 2);
+
+    setErrors({
+      email: !emailValid,
+      password: !passwordValid,
+      name: isRightPanelActive && !nameValid,
+    });
+
+    if (!emailValid || !passwordValid || (isRightPanelActive && !nameValid)) {
+      setMessage("*Por favor, verifica los campos marcados en rojo.");
+      return false;
+    }
+    return true;
   };
 
   const handleAuth = async (provider) => {
+    setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
       const { user } = result;
       await saveUser(user, provider.providerId);
-      localStorage.setItem("lastEmail", user.email); // Guardar el correo
+      localStorage.setItem("lastEmail", user.email);
       setMessage(`Inicio de sesión con ${provider.providerId} exitoso.`);
       navigate("/home");
     } catch (error) {
-      setMessage(
-        `Error al autenticar con ${provider.providerId}: ${error.message}`
-      );
+      setMessage(`Error al autenticar con ${provider.providerId}: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleEmailAuth = async (isSignUp) => {
     if (!validateFields()) return;
+    setIsLoading(true);
     try {
-      const authFunc = isSignUp
-        ? createUserWithEmailAndPassword
-        : signInWithEmailAndPassword;
-      const { user } = await authFunc(
-        auth,
-        credentials.email,
-        credentials.password
-      );
+      const authFunc = isSignUp ? createUserWithEmailAndPassword : signInWithEmailAndPassword;
+      const { user } = await authFunc(auth, credentials.email, credentials.password);
       if (isSignUp) await saveUser(user, "email");
-      localStorage.setItem("lastEmail", credentials.email); // Guardar el correo
+      localStorage.setItem("lastEmail", credentials.email);
       setMessage(`${isSignUp ? "Registro" : "Inicio de sesión"} exitoso.`);
       navigate("/home");
     } catch (error) {
@@ -130,6 +158,8 @@ const AppLogin = () => {
           break;
       }
       setMessage(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,13 +190,7 @@ const AppLogin = () => {
           <form>
             <h1>Iniciar Sesión</h1>
             {message && (
-              <p
-                className={`message ${
-                  message === "*Por favor, completa todos los campos."
-                    ? "error-message"
-                    : ""
-                }`}
-              >
+              <p className="message error-message">
                 {message}
               </p>
             )}
@@ -211,7 +235,25 @@ const AppLogin = () => {
                 <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
               </span>
             </div>
-            <button type="button" onClick={() => handleEmailAuth(false)}>
+            {credentials.password && (
+              <div className="password-strength">
+                <div
+                  className={`password-strength-bar ${
+                    passwordStrength <= 1
+                      ? "strength-weak"
+                      : passwordStrength <= 2
+                      ? "strength-medium"
+                      : "strength-strong"
+                  }`}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => handleEmailAuth(false)}
+              className={isLoading ? "loading" : ""}
+              disabled={isLoading}
+            >
               Iniciar Sesión
             </button>
           </form>
@@ -221,13 +263,7 @@ const AppLogin = () => {
           <form>
             <h1>Crear Cuenta</h1>
             {message && (
-              <p
-                className={`message ${
-                  message === "*Por favor, completa todos los campos."
-                    ? "error-message"
-                    : ""
-                }`}
-              >
+              <p className="message error-message">
                 {message}
               </p>
             )}
@@ -282,7 +318,25 @@ const AppLogin = () => {
                 <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
               </span>
             </div>
-            <button type="button" onClick={() => handleEmailAuth(true)}>
+            {credentials.password && (
+              <div className="password-strength">
+                <div
+                  className={`password-strength-bar ${
+                    passwordStrength <= 1
+                      ? "strength-weak"
+                      : passwordStrength <= 2
+                      ? "strength-medium"
+                      : "strength-strong"
+                  }`}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => handleEmailAuth(true)}
+              className={isLoading ? "loading" : ""}
+              disabled={isLoading}
+            >
               Crear Cuenta
             </button>
           </form>
