@@ -30,6 +30,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
 import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
+import { db } from "../config/firebase";
+import useNotifications from "../hooks/notifications/useNotifications";
 
 const drawerWidth = 240;
 
@@ -100,8 +102,8 @@ export default function Sidebar() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { userData, loading } = useUserData();
-  const displayName = userData?.name || user?.displayName || "Usuario";
+  const { displayName, loading } = useUserData();
+  const notifications = useNotifications(db, user);
 
   // Manejo responsivo automático
   useEffect(() => {
@@ -112,8 +114,8 @@ export default function Sidebar() {
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleDrawerOpen = () => {
@@ -149,15 +151,15 @@ export default function Sidebar() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography 
-            variant="h6" 
-            noWrap 
+          <Typography
+            variant="h6"
+            noWrap
             component="div"
             sx={{
               flexGrow: 1,
-              fontWeight: 'bold',
-              letterSpacing: '.1rem',
-              color: theme.palette.primary.main
+              fontWeight: "bold",
+              letterSpacing: ".1rem",
+              color: theme.palette.primary.main,
             }}
           >
             DoTime
@@ -165,8 +167,8 @@ export default function Sidebar() {
         </Toolbar>
       </AppBar>
 
-      <Drawer 
-        variant={windowWidth < 600 ? "temporary" : "permanent"} 
+      <Drawer
+        variant={windowWidth < 600 ? "temporary" : "permanent"}
         open={drawerOpen}
         onClose={handleDrawerClose}
       >
@@ -180,7 +182,7 @@ export default function Sidebar() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        
+
         {user && (
           <Box
             sx={{
@@ -220,48 +222,50 @@ export default function Sidebar() {
 
         <List>
           {[
-            { 
-              text: "Tareas", 
-              icon: <TaskIcon />, 
+            {
+              text: "Tareas",
+              icon: <TaskIcon />,
               to: "/home",
-              badge: 5,
-              tooltip: "Ver todas tus tareas"
+              badge: notifications.tasks,
+              tooltip: "Ver todas tus tareas",
             },
             {
               text: "Calendario",
               icon: <CalendarMonthIcon />,
               to: "/calendar",
-              badge: 2,
-              tooltip: "Ver calendario de tareas"
+              badge: notifications.calendar,
+              tooltip: "Ver calendario de tareas",
             },
             {
               text: "Configuración",
               icon: <SettingsIcon />,
               to: "/configuracion",
-              tooltip: "Ajustes de la aplicación"
+              tooltip: "Ajustes de la aplicación",
             },
-            { 
-              text: "Soporte y ayuda", 
-              icon: <HelpIcon />, 
+            {
+              text: "Soporte y ayuda",
+              icon: <HelpIcon />,
               to: "/soporte",
-              tooltip: "Obtener ayuda"
+              tooltip: "Obtener ayuda",
             },
-          ].map(({ text, icon, to, badge, tooltip }) => (
-            <Tooltip 
-              key={text}
-              title={tooltip}
-              placement="right"
-              arrow
-            >
+            {
+              text: "Cerrar sesión",
+              icon: <LogoutIcon sx={{ color: "#dc3545" }} />,
+              onClick: handleLogout,
+              tooltip: "Cerrar sesión",
+            },
+          ].map(({ text, icon, to, badge, tooltip, onClick }) => (
+            <Tooltip key={text} title={tooltip} placement="right" arrow>
               <ListItem
                 button
-                component={Link}
+                component={onClick ? "div" : Link}
                 to={to}
+                onClick={onClick}
                 selected={location.pathname === to}
                 sx={{
+                  margin: "5px 0",
                   justifyContent: drawerOpen ? "initial" : "center",
                   px: 2.5,
-                  margin: "5px 0",
                   transition: "background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(255, 194, 71, 0.5)",
@@ -282,7 +286,7 @@ export default function Sidebar() {
                     transition: "color 0.3s ease",
                   }}
                 >
-                  {badge ? (
+                  {badge > 0 ? (
                     <Badge badgeContent={badge} color="error">
                       {icon}
                     </Badge>
@@ -296,36 +300,6 @@ export default function Sidebar() {
               </ListItem>
             </Tooltip>
           ))}
-          
-          <Tooltip title="Cerrar sesión" placement="right" arrow>
-            <ListItem 
-              button 
-              onClick={handleLogout}
-              sx={{
-                justifyContent: drawerOpen ? "initial" : "center",
-                px: 2.5,
-                margin: "5px 0",
-                "&:hover": {
-                  backgroundColor: "rgba(206, 33, 33, 0.2)",
-                }
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: drawerOpen ? 3 : "auto",
-                  justifyContent: "center",
-                  color: "#CE2121",
-                  transition: "color 0.3s ease",
-                }}
-              >
-                <LogoutIcon />
-              </ListItemIcon>
-              {drawerOpen && (
-                <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
-              )}
-            </ListItem>
-          </Tooltip>
         </List>
       </Drawer>
     </Box>

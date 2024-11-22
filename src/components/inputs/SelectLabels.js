@@ -64,6 +64,9 @@ const SelectLabels = ({ selectedTags, setSelectedTags }) => {
       "&:hover": {
         backgroundColor: data.color,
         color: "white",
+        "& svg": {
+          color: "white !important"
+        }
       },
     }),
     multiValue: (styles, { data }) => ({

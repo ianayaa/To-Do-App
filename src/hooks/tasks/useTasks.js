@@ -43,7 +43,8 @@ const useTasks = (db, user) => {
 
         // Crear objeto de tarea con validación de campos
         const task = {
-          id: doc.id,
+          id: doc.id,  // ID original del documento
+          docId: doc.id,  // ID para operaciones de Firestore
           descripcion: taskData.descripcion || '',
           titulo: taskData.titulo || '',
           estado: taskData.estado || 'Pendiente',

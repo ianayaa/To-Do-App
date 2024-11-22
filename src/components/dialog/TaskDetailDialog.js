@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -16,8 +16,16 @@ import {
     DialogContentText,
     IconButton,
     Zoom,
+    List,
+    ListItem,
+    ListItemText,
+    CircularProgress,
+    Alert,
+    AlertTitle
 } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    FontAwesomeIcon
+} from "@fortawesome/react-fontawesome";
 import {
     faPaperclip,
     faCalendarAlt,
@@ -30,29 +38,70 @@ import {
     faCircleArrowUp,
     faTrash,
     faCheck,
+    faExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
-import { Timestamp } from "firebase/firestore";
+import { 
+    Timestamp, 
+    collection, 
+    addDoc, 
+    query, 
+    where, 
+    getDocs, 
+    orderBy,
+    deleteDoc,
+    doc,
+    updateDoc 
+} from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
+import useComments from "../../hooks/comments/useComments";
+import useDeleteComment from "../../hooks/comments/useDeleteComment";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import SchoolIcon from '@mui/icons-material/School';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Fade from '@mui/material/Fade';
+import WarningIcon from '@mui/icons-material/Warning';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
+const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskFromParent }) => {
     const [user] = useAuthState(auth);
-    const { deleteTask: deleteTaskHook, loading, error } = useDeleteTask(db);
+    const { 
+        deleteTask, 
+        loading: loadingDelete, 
+        error: errorDelete 
+    } = useDeleteTask(db);
+    const { deleteComment, loading: loadingDeleteComment } = useDeleteComment(db);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [deleteButtonState, setDeleteButtonState] = useState('initial'); // 'initial', 'confirm', 'success'
+    const [comentario, setComentario] = useState("");
+    const { 
+        comentarios, 
+        loading: loadingComments, 
+        error: errorComments,
+        cargarComentarios,
+        agregarComentario,
+        eliminarComentario
+    } = useComments(db);
+
+    const [confirmDeleteCommentId, setConfirmDeleteCommentId] = useState(null);
+    const [confirmCommentDialogOpen, setConfirmCommentDialogOpen] = useState(false);
+    const [commentDeleteState, setCommentDeleteState] = useState('initial'); // 'initial', 'confirm', 'success'
+
+    const [isEditingDescription, setIsEditingDescription] = useState(false);
+    const [editedDescription, setEditedDescription] = useState("");
+    const [savingDescription, setSavingDescription] = useState(false);
 
     const parseDueDate = (dueDate) =>
         dueDate && dueDate instanceof Timestamp ? dueDate.toDate() : null;
@@ -88,36 +137,24 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
 
     const handleDelete = async () => {
         try {
-            console.log('Intentando eliminar tarea:', task);
+            setDeleteButtonState('confirm');
             
-            if (!task) {
+            if (!task?.id) {
                 throw new Error("No se ha seleccionado ninguna tarea");
             }
-            
-            // Verificar que task.id sea un string válido
-            if (!task.id || typeof task.id !== 'string') {
-                console.error('ID de tarea inválido:', task.id);
-                throw new Error("La tarea no tiene un ID válido");
-            }
 
-            if (!db) {
-                throw new Error("No hay conexión con la base de datos");
-            }
-
-            // Intentar eliminar la tarea
-            console.log('Eliminando tarea con ID:', task.id);
-            await deleteTaskHook(task.id);
+            await deleteTask(task.id);
             
-            // Si la eliminación fue exitosa
             setDeleteButtonState('success');
+            setConfirmDialogOpen(false); // Cerramos el diálogo de confirmación
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
             
-            // Cerrar el diálogo después de un breve delay
+            // Cerrar el diálogo principal después de un breve delay
             setTimeout(() => {
                 handleClose();
-                if (deleteTask) {
-                    deleteTask(task.id);
+                if (deleteTaskFromParent) {
+                    deleteTaskFromParent(task.id);
                 }
             }, 1500);
         } catch (err) {
@@ -125,7 +162,115 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
             setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea");
             setSnackbarOpen(true);
             setDeleteButtonState('initial');
+            setConfirmDialogOpen(false); // Cerramos el diálogo de confirmación en caso de error
         }
+    };
+
+    useEffect(() => {
+        if (task?.id) {
+            cargarComentarios(task.id);
+        }
+    }, [task?.id, cargarComentarios]);
+
+    useEffect(() => {
+        if (task) {
+            setEditedDescription(task.descripcion || "");
+        }
+    }, [task]);
+
+    const handleEditDescription = () => {
+        setIsEditingDescription(true);
+    };
+
+    const handleSaveDescription = async () => {
+        try {
+            setSavingDescription(true);
+            // Verificar que tengamos un ID válido
+            if (!task.docId) {
+                throw new Error("ID de tarea no válido");
+            }
+            
+            const taskRef = doc(db, "tasks", task.docId); 
+            await updateDoc(taskRef, {
+                descripcion: editedDescription,
+                updatedAt: Timestamp.now()
+            });
+            
+            // Actualizar la UI inmediatamente
+            task.descripcion = editedDescription;
+            
+            setIsEditingDescription(false);
+            setSnackbarMessage("Descripción actualizada correctamente");
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Error al actualizar la descripción:", error);
+            setSnackbarMessage(error.message || "Error al actualizar la descripción");
+            setSnackbarOpen(true);
+        } finally {
+            setSavingDescription(false);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditingDescription(false);
+        setEditedDescription(task.descripcion || "");
+    };
+
+    const handleEnviarComentario = async () => {
+        if (!comentario.trim()) return;
+
+        try {
+            const comentarioData = {
+                texto: comentario,
+                userId: user.uid,
+                userName: user.displayName || user.email,
+                userPhoto: user.photoURL || "",
+                taskId: task.id
+            };
+
+            await agregarComentario(comentarioData);
+            setComentario("");
+            setSnackbarMessage("Comentario agregado con éxito");
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Error al enviar comentario:", error);
+            setSnackbarMessage("Error al enviar el comentario");
+            setSnackbarOpen(true);
+        }
+    };
+
+    const handleEliminarComentario = async (comentarioId) => {
+        setConfirmDeleteCommentId(comentarioId);
+        setConfirmCommentDialogOpen(true);
+        setCommentDeleteState('initial');
+    };
+
+    const handleConfirmDeleteComment = async () => {
+        try {
+            setCommentDeleteState('success');
+            await deleteComment(confirmDeleteCommentId);
+            await cargarComentarios(task.id);
+            setSnackbarMessage("Comentario eliminado con éxito");
+            setSnackbarOpen(true);
+            setTimeout(() => {
+                setConfirmCommentDialogOpen(false);
+                setConfirmDeleteCommentId(null);
+                setCommentDeleteState('initial');
+            }, 1500); // Aumentado para dar tiempo a la animación
+        } catch (error) {
+            console.error("Error al eliminar comentario:", error);
+            setSnackbarMessage("Error al eliminar el comentario");
+            setSnackbarOpen(true);
+            setCommentDeleteState('initial');
+            setConfirmCommentDialogOpen(false);
+            setConfirmDeleteCommentId(null);
+        }
+    };
+
+    const handleCancelDeleteComment = () => {
+        setConfirmCommentDialogOpen(false);
+        setConfirmDeleteCommentId(null);
+        setCommentDeleteState('initial');
     };
 
     return (
@@ -149,54 +294,72 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                     },
                 }}
             >
-                <DialogActions
+                <Box
                     sx={{
-                        backgroundColor: "#f8f9fa",
-                        padding: "12px 24px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderBottom: "1px solid #e9ecef",
+                        backgroundColor: '#25283d',
+                        p: 2,
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderTopLeftRadius: 12,
+                        borderTopRightRadius: 12
                     }}
                 >
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            fontWeight: 500,
-                            color: "#2c3e50",
-                            fontSize: "1.1rem",
-                            letterSpacing: "0.5px"
-                        }}
-                    >
-                        Detalles de la tarea:
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <AssignmentIcon sx={{ fontSize: 24 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 0.5 }}>
+                            Detalles de tarea
+                        </Typography>
+                    </Box>
                     <IconButton
                         onClick={handleClose}
-                        size="small"
                         sx={{
-                            color: "#6c757d",
+                            color: 'white',
                             '&:hover': {
-                                color: "#dc3545",
-                                backgroundColor: "rgba(220, 53, 69, 0.1)",
-                            },
-                            transition: "all 0.2s ease-in-out",
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                            }
                         }}
                     >
-                        <FontAwesomeIcon icon={faXmark} />
+                        <CloseIcon />
                     </IconButton>
-                </DialogActions>
+                </Box>
 
-                <DialogTitle>
+                <DialogTitle sx={{ px: 3 }}>
                     <Box display="flex" alignItems="center" gap={2}>
+                        <Typography 
+                            variant="subtitle1"
+                            sx={{
+                                fontWeight: 600,
+                                color: '#25283d',
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1
+                            }}
+                        >
+                            Título:
+                        </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={1} sx={{ mt: 1 }}>
                         <Box
                             sx={{
                                 fontSize: "1.5rem",
                                 color: isOverdue ? "error.main" : "text.primary",
+                                display: "flex",
+                                alignItems: "center"
                             }}
                         >
                             {getStatusIcon()}
                         </Box>
-                        <Typography variant="h6" component="div">
+                        <Typography 
+                            variant="h6" 
+                            component="div" 
+                            sx={{ 
+                                display: "flex", 
+                                alignItems: "center",
+                                minHeight: "32px"
+                            }}
+                        >
                             {task.titulo}
                         </Typography>
                     </Box>
@@ -204,11 +367,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
 
                 <DialogContent sx={{ 
                     display: "flex", 
-                    p: 2, 
+                    p: 3,  
                     height: "100%",
                     position: "relative"
                 }}>
-                    {/* Columna Izquierda */}
                     <Box
                         flex={2}
                         sx={{
@@ -217,29 +379,195 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             display: "flex",
                             flexDirection: "column",
                             height: "100%",
-                            justifyContent: "space-between",
-                            overflowY: "auto"
+                            position: "relative"
                         }}
                     >
-                        {/* Contenedor scrolleable para la descripción */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    whiteSpace: "pre-wrap",
-                                    wordBreak: "break-word"
-                                }}
-                            >
-                                {task.descripcion || "Sin descripción"}
-                            </Typography>
+                        {/* Contenedor scrolleable */}
+                        <Box sx={{ 
+                            flex: 1, 
+                            overflowY: "auto",
+                            pb: "80px" // Espacio para el campo de comentarios
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        fontWeight: 600,
+                                        color: '#25283d'
+                                    }}
+                                >
+                                    Descripción:
+                                </Typography>
+                                {!isEditingDescription && (
+                                    <Button
+                                        size="small"
+                                        onClick={handleEditDescription}
+                                        startIcon={<EditIcon />}
+                                        sx={{ color: '#25283d' }}
+                                    >
+                                        Editar
+                                    </Button>
+                                )}
+                            </Box>
+
+                            {isEditingDescription ? (
+                                <Box sx={{ mt: 1 }}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        rows={4}
+                                        value={editedDescription}
+                                        onChange={(e) => setEditedDescription(e.target.value)}
+                                        variant="outlined"
+                                        placeholder="Escribe la descripción de la tarea..."
+                                        sx={{ mb: 2 }}
+                                    />
+                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                        <Button
+                                            onClick={handleCancelEdit}
+                                            disabled={savingDescription}
+                                            color="inherit"
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button
+                                            onClick={handleSaveDescription}
+                                            disabled={savingDescription}
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={savingDescription ? <CircularProgress size={20} /> : <SaveIcon />}
+                                        >
+                                            Guardar
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            ) : (
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        whiteSpace: "pre-wrap",
+                                        wordBreak: "break-word"
+                                    }}
+                                >
+                                    {task.descripcion || "Sin descripción"}
+                                </Typography>
+                            )}
+
+                            <Box sx={{ mt: 3 }}>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    Comentarios ({comentarios.length})
+                                </Typography>
+                                {loadingComments ? (
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                                        <CircularProgress size={24} />
+                                    </Box>
+                                ) : errorComments ? (
+                                    <Typography color="error" variant="body2">
+                                        Error al cargar comentarios: {errorComments}
+                                    </Typography>
+                                ) : comentarios.length === 0 ? (
+                                    <Typography color="text.secondary" variant="body2">
+                                        No hay comentarios aún
+                                    </Typography>
+                                ) : (
+                                    <List>
+                                        {comentarios.map((com) => (
+                                            <ListItem 
+                                                key={com.id} 
+                                                alignItems="flex-start"
+                                                sx={{
+                                                    backgroundColor: '#fff',
+                                                    borderRadius: 1,
+                                                    mb: 1,
+                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                                    p: 2
+                                                }}
+                                            >
+                                                <Box sx={{ display: 'flex', width: '100%' }}>
+                                                    <Avatar
+                                                        alt={com.userName}
+                                                        src={com.userPhoto}
+                                                        sx={{ 
+                                                            width: 40, 
+                                                            height: 40, 
+                                                            mr: 2,
+                                                            bgcolor: !com.userPhoto ? '#1976d2' : 'inherit'
+                                                        }}
+                                                    >
+                                                        {!com.userPhoto && com.userName?.charAt(0).toUpperCase()}
+                                                    </Avatar>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <Typography
+                                                                component="span"
+                                                                variant="subtitle2"
+                                                                color="primary"
+                                                            >
+                                                                {com.userName}
+                                                            </Typography>
+                                                            {com.userId === user.uid && (
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => handleEliminarComentario(com.id)}
+                                                                    disabled={loadingDeleteComment}
+                                                                    sx={{
+                                                                        color: '#757575',
+                                                                        '&:hover': {
+                                                                            color: '#d32f2f'
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {loadingDeleteComment ? (
+                                                                        <CircularProgress size={16} color="inherit" />
+                                                                    ) : (
+                                                                        <FontAwesomeIcon icon={faTrash} />
+                                                                    )}
+                                                                </IconButton>
+                                                            )}
+                                                        </Box>
+                                                        <Typography
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                            sx={{ display: 'block', my: 0.5 }}
+                                                        >
+                                                            {com.texto}
+                                                        </Typography>
+                                                        <Typography
+                                                            component="span"
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                        >
+                                                            {com.fecha.toDate().toLocaleString()}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                )}
+                            </Box>
                         </Box>
 
-                        {/* Contenedor para los botones */}
-                        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                        {/* Campo de comentarios fijo */}
+                        <Box 
+                            sx={{ 
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: "16px", // Compensar el pr: 2 del contenedor padre
+                                backgroundColor: "#F9F7F3",
+                                pt: 2,
+                                display: "flex",
+                                gap: 2
+                            }}
+                        >
                             <TextField
                                 fullWidth
                                 variant="outlined"
                                 placeholder="Comentar"
+                                value={comentario}
+                                onChange={(e) => setComentario(e.target.value)}
                                 InputProps={{
                                     startAdornment: (
                                         <Avatar
@@ -251,6 +579,8 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                 }}
                             />
                             <Button
+                                onClick={handleEnviarComentario}
+                                disabled={!comentario.trim()}
                                 sx={{
                                     marginLeft: "8px",
                                     padding: 0,
@@ -266,14 +596,13 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                     size="lg"
                                     style={{
                                         fontSize: "2rem",
-                                        color: "#757575",
+                                        color: comentario.trim() ? "#1976d2" : "#757575",
                                     }}
                                 />
                             </Button>
                         </Box>
                     </Box>
 
-                    {/* Columna Derecha */}
                     <Box
                         flex={1}
                         sx={{
@@ -286,7 +615,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             borderLeft: "1px solid #d0d0d0",
                         }}
                     >
-                        {/* Contenedor scrolleable para el contenido */}
                         <Box sx={{ 
                             overflowY: "auto", 
                             flex: 1,
@@ -332,11 +660,11 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                     {task.tags && task.tags.length > 0 ? (
                                         task.tags.map((tag, index) => {
                                             const tagConfigs = {
-                                                "Importante": { 
+                                                "Importante": {
                                                     color: "#dc3545",
                                                     icon: <PriorityHighIcon sx={{ fontSize: 20, color: 'white' }} />
                                                 },
-                                                "Urgente": { 
+                                                "Urgente": {
                                                     color: "#fd7e14",
                                                     icon: <NotificationsActiveIcon sx={{ fontSize: 20, color: 'white' }} />
                                                 },
@@ -372,8 +700,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                                             paddingLeft: '8px'
                                                         },
                                                         '&:hover': {
-                                                            backgroundColor: tagConfig.color,
-                                                            opacity: 0.8
+                                                            backgroundColor: `${tagConfig.color}cc`,
+                                                            '& .MuiChip-icon, & svg': {
+                                                                color: 'white !important'
+                                                            }
                                                         }
                                                     }}
                                                 />
@@ -388,11 +718,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             </Box>
                         </Box>
 
-                        {/* Botón de eliminar con posición fija */}
                         <Box
                             sx={{
                                 position: "absolute",
-                                bottom: 0,
+                                bottom: -8,
                                 left: 0,
                                 right: 0,
                                 padding: "16px",
@@ -418,10 +747,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                             <FontAwesomeIcon icon={faTrash} />
                                         )
                                     }
-                                    sx={{
-                                        transition: 'all 0.3s ease-in-out',
-                                        transform: deleteButtonState === 'success' ? 'scale(1.1)' : 'scale(1)',
-                                    }}
                                 >
                                     {deleteButtonState === 'success'
                                         ? 'Eliminado'
@@ -439,40 +764,195 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
             <Dialog
                 open={confirmDialogOpen}
                 onClose={handleCancelDelete}
-                TransitionComponent={Slide}
-                TransitionProps={{ direction: "up" }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        p: 1
+                    }
+                }}
             >
-                <DialogTitle>
-                    {"¿Estás seguro de que quieres eliminar esta tarea?"}
+                <DialogTitle id="alert-dialog-title" sx={{ pb: 1 }}>
+                    {"¿Eliminar esta tarea?"}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        Esta acción no se puede deshacer.
+                    <DialogContentText id="alert-dialog-description">
+                        Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar esta tarea?
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button 
                         onClick={handleCancelDelete}
-                        color="primary"
-                        variant="outlined"
+                        color="inherit"
+                        disabled={loadingDelete}
                     >
-                        No, Cancelar
+                        Cancelar
                     </Button>
                     <Button 
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
-                        disabled={loading}
+                        disabled={loadingDelete}
                         autoFocus
+                        sx={{
+                            minWidth: '100px',
+                            position: 'relative'
+                        }}
                     >
-                        Sí, Eliminar
+                        {loadingDelete ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            <>
+                                <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} />
+                                Eliminar
+                            </>
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
 
+            {/* Diálogo de confirmación para eliminar comentario */}
+            <Dialog
+                open={confirmCommentDialogOpen}
+                onClose={() => {
+                    setConfirmCommentDialogOpen(false);
+                    setCommentDeleteState('initial');
+                }}
+                aria-labelledby="alert-dialog-title-comment"
+                aria-describedby="alert-dialog-description-comment"
+                TransitionComponent={Transition}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        p: 0,
+                        minWidth: '400px',
+                        overflow: 'hidden'
+                    }
+                }}
+            >
+                <Box sx={{ 
+                    p: 2 
+                }}>
+                    <Fade in={true} timeout={300}>
+                        <Alert 
+                            severity={commentDeleteState === 'success' ? "success" : "warning"}
+                            variant="filled"
+                            sx={{ 
+                                '& .MuiAlert-icon': {
+                                    fontSize: '2rem'
+                                },
+                                '& .MuiAlert-message': {
+                                    width: '100%'
+                                },
+                                py: 1,
+                                backgroundColor: commentDeleteState === 'success' 
+                                    ? 'success.main'
+                                    : 'warning.main',
+                                transform: commentDeleteState === 'success' 
+                                    ? 'scale(1.02)'
+                                    : 'scale(1)',
+                                transition: 'all 0.3s ease-in-out'
+                            }}
+                        >
+                            <AlertTitle sx={{ 
+                                fontWeight: 700,
+                                fontSize: '1.1rem',
+                                mb: 0.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1
+                            }}>
+                                {commentDeleteState === 'success' ? (
+                                    <Fade in={true} timeout={400}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            ¡Operación Exitosa!
+                                        </Box>
+                                    </Fade>
+                                ) : (
+                                    <Fade in={true} timeout={400}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            ¡Atención!
+                                        </Box>
+                                    </Fade>
+                                )}
+                            </AlertTitle>
+                            <Fade in={commentDeleteState !== 'success'} timeout={500}>
+                                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                    {commentDeleteState === 'success' 
+                                        ? null
+                                        : "Esta acción no se puede deshacer. ¿Estás seguro de que deseas continuar?"}
+                                </Typography>
+                            </Fade>
+                        </Alert>
+                    </Fade>
+
+                    <Fade in={commentDeleteState !== 'success'} timeout={600}>
+                        <DialogActions sx={{ 
+                            px: 0.5,
+                            pt: 2,
+                            pb: 0,
+                            justifyContent: 'center',
+                            '& .MuiButton-root': {
+                                minHeight: 0,
+                                py: 1
+                            }
+                        }}>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button 
+                                    onClick={handleCancelDeleteComment}
+                                    disabled={loadingDeleteComment}
+                                    sx={{
+                                        px: 3,
+                                        borderRadius: 2,
+                                        color: 'text.secondary',
+                                        '&:hover': {
+                                            backgroundColor: 'grey.100'
+                                        }
+                                    }}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button 
+                                    onClick={handleConfirmDeleteComment}
+                                    color="error"
+                                    variant="contained"
+                                    disabled={loadingDeleteComment}
+                                    autoFocus
+                                    sx={{
+                                        px: 3,
+                                        borderRadius: 2,
+                                        position: 'relative',
+                                        backgroundColor: 'error.main',
+                                        '&:hover': {
+                                            backgroundColor: 'error.dark'
+                                        }
+                                    }}
+                                >
+                                    {loadingDeleteComment ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        <>
+                                            <FontAwesomeIcon 
+                                                icon={faTrash} 
+                                                style={{ 
+                                                    marginRight: '8px',
+                                                    fontSize: '0.9rem'
+                                                }} 
+                                            />
+                                            Eliminar
+                                        </>
+                                    )}
+                                </Button>
+                            </Box>
+                        </DialogActions>
+                    </Fade>
+                </Box>
+            </Dialog>
+
             <Snackbar
                 open={snackbarOpen}
-                autoHideDuration={3000}
+                autoHideDuration={6000}
                 onClose={() => setSnackbarOpen(false)}
                 message={snackbarMessage}
             />
