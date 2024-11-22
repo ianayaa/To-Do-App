@@ -1,11 +1,12 @@
 .statusIcon {
   width: 50px;
   height: 50px;
-  border-radius: 20%;
+  border-radius: 20%; /* Mantener un diseño redondeado */
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 10px;
+  flex-shrink: 0; /* Evitar que se deforme en espacios pequeños */
 }
 
 .statusIcon.completed {
@@ -24,8 +25,40 @@
 }
 
 .progress-component:hover {
-  background-color: #ffc24714; /* Un ligero color de fondo al hacer hover */
-  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
-  border: 2px solid #ffc10744;
+  background-color: rgba(255, 194, 71, 0.1); /* Color translúcido */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Transiciones suaves */
+  border: 2px solid rgba(255, 193, 7, 0.3); /* Borde ligeramente visible */
   border-radius: 12px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .statusIcon {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    border-radius: 15%; /* Redondeado más pequeño */
+  }
+
+  .progress-component:hover {
+    background-color: rgba(
+      255,
+      194,
+      71,
+      0.2
+    ); /* Color más intenso en pantallas táctiles */
+  }
+}
+
+@media (max-width: 480px) {
+  .statusIcon {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+    border-radius: 10%; /* Redondeado ajustado */
+  }
+
+  .progress-component:hover {
+    border-width: 1px; /* Borde más fino en pantallas pequeñas */
+  }
 }

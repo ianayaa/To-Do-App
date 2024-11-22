@@ -6,9 +6,7 @@ const AddTask = ({ addTask, closeAddTask }) => {
   const [taskName, setTaskName] = useState("");
   const [taskDate, setTaskDate] = useState(new Date());
   const [taskDescription, setTaskDescription] = useState("");
-  const [selectedTags, setSelectedTags] = useState([
-    { value: "Importante", label: "Importante" },
-  ]);
+  const [selectedTags, setSelectedTags] = useState([]); // Inicializar sin etiquetas por defecto
 
   const onSelectDate = (date) => {
     setTaskDate(new Date(date));

@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 import TaskDetailDialog from "../dialog/TaskDetailDialog";
+import { db } from "../../config/firebase";
 
 const TaskCard = ({ task, deleteTask }) => {
   // Agregar deleteTask como prop
@@ -68,6 +69,8 @@ const TaskCard = ({ task, deleteTask }) => {
         open={open}
         handleClose={() => setOpen(false)}
         task={task}
+        db={db}
+        deleteTask={deleteTask}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
+const SelectLabels = ({ selectedTags, setSelectedTags }) => {
   const options = [
     { value: "Importante", label: "Importante" },
     { value: "Urgente", label: "Urgente" },
@@ -14,8 +14,8 @@ const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: "300px", // Ancho predeterminado
-      overflowX: "auto", // Permitir desplazamiento horizontal
+      width: "300px", 
+      overflowX: "auto", 
       backgroundColor: "transparent",
       borderColor: "#ced4da",
       borderRadius: "8px",
@@ -27,8 +27,8 @@ const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
     }),
     valueContainer: (provided) => ({
       ...provided,
-      overflow: "hidden", // Evitar que el contenido desborde
-      flexWrap: "nowrap", // Asegurar que los chips no se envuelvan
+      overflow: "hidden", 
+      flexWrap: "nowrap", 
     }),
     option: (provided, state) => ({
       ...provided,
@@ -42,17 +42,17 @@ const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
     multiValue: (styles) => ({
       ...styles,
       backgroundColor: "#0d6efd",
-      borderRadius: "15px", // Hacer los "pills" redondeados
+      borderRadius: "15px", 
     }),
     multiValueLabel: (styles) => ({
       ...styles,
       color: "white",
-      borderRadius: "15px", // Asegurar que el texto dentro de los pills también sea redondeado
+      borderRadius: "15px", 
     }),
     multiValueRemove: (styles) => ({
       ...styles,
       color: "white",
-      borderRadius: "15px", // Redondear el botón de eliminar
+      borderRadius: "15px", 
       ":hover": {
         backgroundColor: "#dc3545",
         color: "white",
@@ -65,8 +65,8 @@ const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
       components={animatedComponents}
       isMulti
       options={options}
-      value={selectedLabels}
-      onChange={setSelectedLabels}
+      value={selectedTags}
+      onChange={setSelectedTags}
       styles={customStyles}
       className="basic-multi-select"
       classNamePrefix="select"

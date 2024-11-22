@@ -10,15 +10,16 @@ const useAddTasks = (db, user) => {
       const taskWithUserId = {
         ...newTask,
         user_id: user.uid,
-        createdAt: serverTimestamp(), // Añadir la marca de tiempo del servidor
-        tags: selectedTags.map((tag) => tag.value), // Agregar las etiquetas como array de valores
+        createdAt: serverTimestamp(),
+        tags: selectedTags.map((tag) => tag.value), // Asegurarnos de que solo guardamos los valores
       };
 
       try {
-        await addDoc(collection(db, "tasks"), taskWithUserId);
-        console.log("Tarea añadida!");
+        const docRef = await addDoc(collection(db, "tasks"), taskWithUserId);
+        console.log("Tarea añadida con ID:", docRef.id);
       } catch (error) {
-        console.error("Error añadiendo la tarea: ", error);
+        console.error("Error añadiendo la tarea:", error);
+        throw error;
       }
     },
     [db, user?.uid]

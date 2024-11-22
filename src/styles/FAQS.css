@@ -31,6 +31,11 @@ body {
 }
 
 .faq-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,9 +51,17 @@ body {
 }
 
 .faq-image {
-  max-width: 50%;
+  max-width: 300px;
   height: auto;
-  margin-bottom: 20px;
+  margin: 2rem auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.faq-image:hover {
+  transform: scale(1.02);
 }
 
 .faq-list {
@@ -86,7 +99,19 @@ body {
   color: #ffce47;
 }
 
-/* Responsivo */
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos responsivos */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -96,5 +121,31 @@ body {
   }
   .faq-list {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .faq-container {
+    padding: 1rem;
+  }
+
+  .faq-image {
+    max-width: 250px;
+  }
+}
+
+/* Estilos para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .faq-image,
+  .MuiCollapse-root {
+    transition: none !important;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .faq-container {
+    background-color: white;
+    color: black;
   }
 }

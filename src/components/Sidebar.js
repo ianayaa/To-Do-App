@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../config/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -6,7 +6,6 @@ import {
   styled,
   useTheme,
   Box,
-  Drawer,
   CssBaseline,
   Toolbar,
   IconButton,
@@ -18,6 +17,7 @@ import {
   ListItemText,
   Avatar,
 } from "@mui/material";
+import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -27,22 +27,26 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
+import useUserData from "../hooks/user/useUserData";
+import Badge from "@mui/material/Badge";
+import Tooltip from "@mui/material/Tooltip";
 
-const drawerWidth = 300;
+const drawerWidth = 240;
 
-// Estilo para el AppBar
+// Estilos para el AppBar
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
+    marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
@@ -51,22 +55,82 @@ const AppBar = styled(MuiAppBar, {
   color: "#25283d",
 }));
 
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  transition: "all 0.3s ease-in-out", // Transición suave
+  ...(open && {
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    "& .MuiDrawer-paper": {
+      width: drawerWidth,
+      backgroundColor: "#25283d",
+      transition: "all 0.3s ease-in-out", // Transición suave
+    },
+  }),
+  ...(!open && {
+    width: `calc(${theme.spacing(7)} + 1px)`,
+    "& .MuiDrawer-paper": {
+      width: `calc(${theme.spacing(7)} + 1px)`,
+      backgroundColor: "#25283d",
+      transition: "all 0.3s ease-in-out", // Transición suave
+    },
+  }),
+}));
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
 }));
 
-export default function Sidebar({ open, toggleDrawer }) {
+export default function Sidebar() {
   const theme = useTheme();
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const location = useLocation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { userData, loading } = useUserData();
+  const displayName = userData?.name || user?.displayName || "Usuario";
+
+  // Manejo responsivo automático
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth < 600) {
+        setDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    if (windowWidth < 600) {
+      setDrawerOpen(false);
+    }
+  };
 
   const handleLogout = async () => {
-    localStorage.setItem("lastEmail", user?.email);
+    if (user?.email) {
+      localStorage.setItem("lastEmail", user.email);
+    }
     await auth.signOut();
     navigate("/");
   };
@@ -74,40 +138,41 @@ export default function Sidebar({ open, toggleDrawer }) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={drawerOpen}>
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
-            onClick={toggleDrawer}
+            aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
+            onClick={drawerOpen ? handleDrawerClose : handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
+            sx={{ marginRight: 5, ...(drawerOpen && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 'bold',
+              letterSpacing: '.1rem',
+              color: theme.palette.primary.main
+            }}
+          >
             DoTime
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: "#25283d", // Fondo blanco
-            boxShadow: "none", // Sin sombra
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
+
+      <Drawer 
+        variant={windowWidth < 600 ? "temporary" : "permanent"} 
+        open={drawerOpen}
+        onClose={handleDrawerClose}
       >
         <DrawerHeader>
-          <IconButton onClick={toggleDrawer}>
-            {theme.direction === "ltr" ? (
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === "rtl" ? (
               <ChevronLeftIcon sx={{ color: "white" }} />
             ) : (
               <ChevronRightIcon sx={{ color: "white" }} />
@@ -115,116 +180,152 @@ export default function Sidebar({ open, toggleDrawer }) {
           </IconButton>
         </DrawerHeader>
         <Divider />
-
-        {/* Perfil del usuario */}
+        
         {user && (
-          <Box sx={{ padding: 2, display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: drawerOpen ? "flex-start" : "center",
+              flexDirection: drawerOpen ? "row" : "column",
+              transition: "all 0.3s ease-in-out", // Transición suave para el perfil
+            }}
+          >
             <Avatar
-              alt={user.displayName || "User"}
-              src={user.photoURL || ""}
-              sx={{ width: 50, height: 50, marginRight: 2 }}
+              alt={displayName}
+              src={user?.photoURL || ""}
+              sx={{
+                width: 50,
+                height: 50,
+                marginRight: drawerOpen ? 2 : 0,
+                marginBottom: drawerOpen ? 0 : 1,
+              }}
             />
-            <Typography variant="h6" sx={{ color: "white" }}>
-              {user.displayName || "Nombre de usuario"}
-            </Typography>
+            {drawerOpen && (
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "white",
+                  whiteSpace: "normal",
+                  overflowWrap: "break-word",
+                  transition: "all 0.3s ease-in-out", // Transición suave para el nombre
+                }}
+              >
+                {loading ? "Cargando..." : displayName}
+              </Typography>
+            )}
           </Box>
         )}
+
         <List>
-          <ListItem
-            button
-            component={Link}
-            to="/home"
-            selected={location.pathname === "/home"}
-            sx={{
-              margin: "5px 0",
-              padding: "5px 20px",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/home" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "rgba(255, 194, 71, 0.7)", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <TaskIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Tareas" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/calendar"
-            selected={location.pathname === "/calendar"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/calendar" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "rgba(255, 194, 71, 0.7)", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <CalendarMonthIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Calendario" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/configuracion"
-            selected={location.pathname === "/configuracion"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/configuracion" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "#ffc247", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <SettingsIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Configuración" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/soporte"
-            selected={location.pathname === "/soporte"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/soporte" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "#ffc247", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <HelpIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Soporte y ayuda" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem button onClick={handleLogout}>
-            <ListItemIcon>
-              <LogoutIcon sx={{ color: "#CE2121" }} />
-            </ListItemIcon>
-            <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
-          </ListItem>
+          {[
+            { 
+              text: "Tareas", 
+              icon: <TaskIcon />, 
+              to: "/home",
+              badge: 5,
+              tooltip: "Ver todas tus tareas"
+            },
+            {
+              text: "Calendario",
+              icon: <CalendarMonthIcon />,
+              to: "/calendar",
+              badge: 2,
+              tooltip: "Ver calendario de tareas"
+            },
+            {
+              text: "Configuración",
+              icon: <SettingsIcon />,
+              to: "/configuracion",
+              tooltip: "Ajustes de la aplicación"
+            },
+            { 
+              text: "Soporte y ayuda", 
+              icon: <HelpIcon />, 
+              to: "/soporte",
+              tooltip: "Obtener ayuda"
+            },
+          ].map(({ text, icon, to, badge, tooltip }) => (
+            <Tooltip 
+              key={text}
+              title={tooltip}
+              placement="right"
+              arrow
+            >
+              <ListItem
+                button
+                component={Link}
+                to={to}
+                selected={location.pathname === to}
+                sx={{
+                  justifyContent: drawerOpen ? "initial" : "center",
+                  px: 2.5,
+                  margin: "5px 0",
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 194, 71, 0.5)",
+                  },
+                  ...(location.pathname === to && {
+                    border: "2px solid #ffc247",
+                    borderRadius: "5px",
+                    backgroundColor: "rgba(255, 194, 71, 0.7)",
+                  }),
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: drawerOpen ? 3 : "auto",
+                    justifyContent: "center",
+                    color: "white",
+                    transition: "color 0.3s ease",
+                  }}
+                >
+                  {badge ? (
+                    <Badge badgeContent={badge} color="error">
+                      {icon}
+                    </Badge>
+                  ) : (
+                    icon
+                  )}
+                </ListItemIcon>
+                {drawerOpen && (
+                  <ListItemText primary={text} sx={{ color: "white" }} />
+                )}
+              </ListItem>
+            </Tooltip>
+          ))}
+          
+          <Tooltip title="Cerrar sesión" placement="right" arrow>
+            <ListItem 
+              button 
+              onClick={handleLogout}
+              sx={{
+                justifyContent: drawerOpen ? "initial" : "center",
+                px: 2.5,
+                margin: "5px 0",
+                "&:hover": {
+                  backgroundColor: "rgba(206, 33, 33, 0.2)",
+                }
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: drawerOpen ? 3 : "auto",
+                  justifyContent: "center",
+                  color: "#CE2121",
+                  transition: "color 0.3s ease",
+                }}
+              >
+                <LogoutIcon />
+              </ListItemIcon>
+              {drawerOpen && (
+                <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
+              )}
+            </ListItem>
+          </Tooltip>
         </List>
       </Drawer>
     </Box>

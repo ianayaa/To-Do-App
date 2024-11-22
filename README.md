@@ -2,12 +2,12 @@
 
 ## Descripción
 
-Este repositorio contiene el código fuente del **front-end** de la aplicación web **To-Do**, diseñada para gestionar y organizar tareas de manera eficiente. La aplicación ofrece una interfaz intuitiva y minimalista, donde los usuarios pueden:
+Este repositorio contiene el código fuente de la aplicación web **To-Do**, diseñada para gestionar y organizar tareas de manera eficiente. La aplicación ofrece una interfaz intuitiva y minimalista, donde los usuarios pueden:
 
 - Crear, editar, y eliminar tareas.
 - Establecer recordatorios y plazos.
 - Recibir descripciones automáticas y sugerencias para tareas mediante una **API de IA**.
-- Sincronizar las tareas con **Google Calendar** y **Apple Calendar**.
+- Sincronizar las tareas con **Google Calendar**.
 - Filtrar tareas por fecha, hora, y prioridad.
 - Adjuntar archivos a las tareas.
   
@@ -17,7 +17,7 @@ El front-end está desarrollado con **React**, utilizando **HTML5**, **CSS3**, y
 
 - **Diseño minimalista**: Interfaz limpia y fácil de usar.
 - **Bilingüe**: Disponible en inglés y español.
-- **Sincronización** con calendarios externos.
+- **Sincronización** con Google Calendar.
 - **IA para sugerencias y descripciones**: Uso de la API de IA para mejorar la productividad del usuario.
 - **Manejo de archivos adjuntos**: Permite a los usuarios agregar archivos a sus tareas.
 

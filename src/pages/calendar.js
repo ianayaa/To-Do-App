@@ -1,107 +1,190 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import "../styles/calendar.css";
 import useTasks from "../hooks/tasks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
+import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "../styles/calendar.css";
+import { 
+  CardContent, 
+  Box, 
+  Typography,
+  IconButton,
+  Tooltip,
+  Paper,
+  Chip
+} from "@mui/material";
+import moment from "moment";
+import TaskDetailDialog from "../components/dialog/TaskDetailDialog";
+import TodayIcon from "@mui/icons-material/Today";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import ViewAgendaIcon from "@mui/icons-material/ViewAgenda";
 
-const Calendar = () => {
+moment.locale("es"); 
+const localizer = momentLocalizer(moment);
+
+const PageCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [user] = useAuthState(auth);
   const { tasks } = useTasks(db, user);
+  const [open, setOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [view, setView] = useState("month");
 
-  // Filtrar tareas para el día seleccionado
-  const tasksForSelectedDate = tasks.filter((task) => {
-    const taskDate = task.dueDate?.toDate();
-    return taskDate && dayjs(taskDate).isSame(selectedDate, "day");
-  });
+  const events = tasks.map((task) => ({
+    id: task.id,
+    title: task.descripcion,
+    allDay: true,
+    start: new Date(task.dueDate.toDate()),
+    end: new Date(task.dueDate.toDate()),
+    estado: task.estado,
+    etiquetas: task.etiquetas || [],
+  }));
 
-  const handlePrevMonth = () => {
-    setCurrentMonth(currentMonth.subtract(1, "month"));
-  };
+  const eventColors = (event) => {
+    let style = {
+      backgroundColor: "#E3E3E3",
+      color: "#000000",
+      borderRadius: "8px",
+      border: "none",
+      padding: "4px",
+      fontSize: "14px",
+      fontWeight: "500",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    };
 
-  const handleNextMonth = () => {
-    setCurrentMonth(currentMonth.add(1, "month"));
-  };
-
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
-  };
-
-  const generateCalendar = () => {
-    const daysInMonth = currentMonth.daysInMonth();
-    const startDay = currentMonth.startOf("month").day();
-    const calendar = [];
-    let dayCounter = 1;
-
-    for (let week = 0; week < 6; week++) {
-      const days = [];
-      for (let day = 0; day < 7; day++) {
-        if (week === 0 && day < startDay) {
-          days.push(<td key={`${week}-${day}`} className="empty-cell"></td>);
-        } else if (dayCounter > daysInMonth) {
-          days.push(<td key={`${week}-${day}`} className="empty-cell"></td>);
-        } else {
-          const date = dayjs(
-            new Date(currentMonth.year(), currentMonth.month(), dayCounter)
-          );
-          const isSelected = date.isSame(selectedDate, "day");
-          days.push(
-            <td
-              key={`${week}-${day}`}
-              className={`date-cell ${isSelected ? "selected" : ""}`}
-              onClick={() => handleDateClick(date)}
-            >
-              {dayCounter}
-            </td>
-          );
-          dayCounter++;
-        }
-      }
-      calendar.push(<tr key={week}>{days}</tr>);
+    if (event.estado === "Completada") {
+      style.backgroundColor = "#4CAF50";
+      style.color = "#FFFFFF";
+    } else if (event.estado === "Pendiente") {
+      style.backgroundColor = "#ffc247";
+      style.color = "#000000";
     }
-    return calendar;
+
+    return { style };
   };
+
+  const CustomToolbar = (toolbar) => {
+    const goToToday = () => {
+      toolbar.date.setMonth(new Date().getMonth());
+      toolbar.date.setYear(new Date().getFullYear());
+      toolbar.onNavigate('TODAY');
+    };
+
+    const viewOptions = [
+      { key: "month", icon: <ViewModuleIcon />, label: "Mes" },
+      { key: "week", icon: <ViewWeekIcon />, label: "Semana" },
+      { key: "day", icon: <TodayIcon />, label: "Día" },
+      { key: "agenda", icon: <ViewAgendaIcon />, label: "Agenda" }
+    ];
+
+    return (
+      <Box sx={{ 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        p: 2, 
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px 8px 0 0"
+      }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton onClick={() => toolbar.onNavigate('PREV')}>
+            {"<"}
+          </IconButton>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            {moment(toolbar.date).format('MMMM YYYY')}
+          </Typography>
+          <IconButton onClick={() => toolbar.onNavigate('NEXT')}>
+            {">"}
+          </IconButton>
+          <Tooltip title="Ir a hoy">
+            <IconButton onClick={goToToday} color="primary">
+              <TodayIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        
+        <Box sx={{ display: "flex", gap: 1 }}>
+          {viewOptions.map(({key, icon, label}) => (
+            <Tooltip key={key} title={label}>
+              <IconButton 
+                onClick={() => toolbar.onView(key)}
+                color={view === key ? "primary" : "default"}
+              >
+                {icon}
+              </IconButton>
+            </Tooltip>
+          ))}
+        </Box>
+      </Box>
+    );
+  };
+
+  const CustomEvent = ({ event }) => (
+    <Box sx={{ p: 0.5 }}>
+      <Typography variant="body2" noWrap>{event.title}</Typography>
+      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+        {event.etiquetas?.map((tag, index) => (
+          <Chip 
+            key={index}
+            label={tag}
+            size="small"
+            sx={{ 
+              height: "16px",
+              fontSize: "10px",
+              backgroundColor: "rgba(255,255,255,0.3)"
+            }}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
 
   return (
-    <div className="custom-calendar">
-      <div className="calendar-header">
-        <button onClick={handlePrevMonth}>&lt;</button>
-        <span>{currentMonth.format("MMMM YYYY")}</span>
-        <button onClick={handleNextMonth}>&gt;</button>
-      </div>
-      <div className="calendar-date-display">
-        <h2>{selectedDate.format("ddd, MMM D")}</h2>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>D</th>
-            <th>L</th>
-            <th>M</th>
-            <th>M</th>
-            <th>J</th>
-            <th>V</th>
-            <th>S</th>
-          </tr>
-        </thead>
-        <tbody>{generateCalendar()}</tbody>
-      </table>
-      <div className="tasks-for-selected-date">
-        <h3>Tareas para {selectedDate.format("DD MMM YYYY")}:</h3>
-        {tasksForSelectedDate.length > 0 ? (
-          <ul>
-            {tasksForSelectedDate.map((task) => (
-              <li key={task.id}>{task.titulo}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay tareas para esta fecha.</p>
-        )}
-      </div>
-    </div>
+    <Paper elevation={3} sx={{ height: "90vh", m: 2, overflow: "hidden" }}>
+      <BigCalendar
+        selectable
+        defaultView="month"
+        view={view}
+        onView={setView}
+        events={events}
+        scrollToTime={new Date(1970, 1, 1, 6)}
+        defaultDate={new Date()}
+        localizer={localizer}
+        style={{ height: "100%" }}
+        eventPropGetter={eventColors}
+        onSelectEvent={(event) => {
+          setOpen(true);
+          setSelectedTask(event);
+        }}
+        components={{
+          toolbar: CustomToolbar,
+          event: CustomEvent
+        }}
+        messages={{
+          next: "Siguiente",
+          previous: "Anterior",
+          today: "Hoy",
+          month: "Mes",
+          week: "Semana",
+          day: "Día",
+          agenda: "Agenda",
+          date: "Fecha",
+          time: "Hora",
+          event: "Evento",
+          noEventsInRange: "No hay tareas en este período"
+        }}
+      />
+      <TaskDetailDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        task={selectedTask}
+      />
+    </Paper>
   );
 };
 
-export default Calendar;
+export default PageCalendar;

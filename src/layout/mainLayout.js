@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
+import { useMediaQuery } from "@mui/material";
+import MobileNavigation from "../components/Navigationbar";
 import { Outlet } from "react-router-dom";
 
 const MainLayout = () => {
   const [open, setOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // Función para alternar el Drawer
   const toggleDrawer = () => {
@@ -12,12 +15,17 @@ const MainLayout = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar open={open} toggleDrawer={toggleDrawer} />
+      {isMobile ? (
+        <MobileNavigation />
+      ) : (
+        <Sidebar open={open} toggleDrawer={toggleDrawer} />
+      )}
       <div
         style={{
-          marginLeft: open ? 10 : -40,
+          marginLeft: open ? 10 : 40,
           marginRight: open ? "10%" : "10%",
           marginTop: "7%",
+          marginBottom: "5%",
           transition: "margin-left 0.3s ease",
           width: "95%",
         }}

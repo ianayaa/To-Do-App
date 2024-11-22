@@ -1,128 +1,193 @@
 /* Estilos Usuario */
 * {
-    box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
 }
 
 /* Contenedor principal */
 .configuracion-usuario-container {
-    display: flex;
-    width: 100%;
-    border-radius: 15px;
-    background-color: #fdfbf7; /* Color de fondo principal */
-    overflow: hidden;
-    flex-wrap: wrap;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  width: 100%;
+  border-radius: 15px;
+  background-color: #fdfbf7; /* Color de fondo principal */
+  overflow: hidden;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+#profileImagePreview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Contenido principal */
 .configuracion-content {
-    width: 100%;
-    padding: 40px;
+  width: 100%;
+  padding: 40px;
 }
 
 h1 {
-    color: #22263d;
-    margin-bottom: 20px;
-    font-size: 1.5em;
+  color: #22263d;
+  margin-bottom: 20px;
+  font-size: 1.5em;
 }
 
 /* Configuración de usuario */
 .user-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 40px;
-    background-color: transparent !important; /* Fondo transparente garantizado */
-    border-radius: 8px;
-    padding: 10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  background-color: transparent !important; /* Fondo transparente garantizado */
+  border-radius: 8px;
+  padding: 10px;
 }
 
 /* Sección de perfil (imagen y botones) */
 .profile-section {
-    display: flex;
-    align-items: center; /* Alinea la imagen y los botones verticalmente */
-    margin-right: 20px; /* Espacio a la derecha de la sección del perfil */
+  display: flex;
+  align-items: center; /* Alinea la imagen y los botones verticalmente */
+  margin-right: 20px; /* Espacio a la derecha de la sección del perfil */
 }
 
 /* Imagen de perfil con fondo transparente */
 .user-info img {
-    width: 80px; /* Tamaño de la imagen */
-    height: 80px;
-    border-radius: 50%;
-    margin-right: 10px; /* Espacio entre la imagen y los botones */
-    background-color: transparent; /* Asegura que no tenga fondo */
+  width: 80px; /* Tamaño de la imagen */
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 10px; /* Espacio entre la imagen y los botones */
+  background-color: transparent; /* Asegura que no tenga fondo */
 }
 
 /* Eliminar cualquier fondo al hacer hover en .user-info */
 .user-info div:hover {
-    background-color: transparent !important; /* Fondo transparente forzado al hacer hover */
+  background-color: transparent !important; /* Fondo transparente forzado al hacer hover */
 }
 
 /* Estilos para los botones en la sección de configuración */
 .settings {
-    display: flex;
-    flex-direction: column;
-    background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
 }
 
 .settings .btn {
-    margin: 5px 0; /* Espaciado vertical entre botones */
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    background-color: #ffc247; /* Color de fondo de los botones */
-    color: #fff;
+  margin: 5px 0; /* Espaciado vertical entre botones */
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  background-color: #ffc247; /* Color de fondo de los botones */
+  color: #fff;
 }
 
 .settings .btn:hover {
-    background-color: #e6b640; /* Color de fondo al pasar el mouse */
+  background-color: #e6b640; /* Color de fondo al pasar el mouse */
 }
 
 .settings .delete-photo {
-    background-color: #ce2121; /* Color de fondo del botón de eliminar */
+  background-color: #ce2121; /* Color de fondo del botón de eliminar */
 }
 
 .settings .delete-photo:hover {
-    background-color: #b81c1c; /* Color al pasar el mouse sobre el botón de eliminar */
+  background-color: #b81c1c; /* Color al pasar el mouse sobre el botón de eliminar */
 }
 
 /* Estilo de las secciones de información */
 .info-section {
-    margin-top: 20px; /* Espacio superior para separar del perfil */
+  margin-top: 20px; /* Espacio superior para separar del perfil */
 }
 
 .info-section label {
-    display: block;
-    color: #333;
-    margin: 10px 0;
-    font-weight: bold;
+  display: block;
+  color: #333;
+  margin: 10px 0;
+  font-weight: bold;
 }
 
-.info-section input {
-    min-width: 200px;
-    width: 250px;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+.input-field {
+  min-width: 200px;
+  width: 250px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.save-changes {
+  display: flex;
+  margin: 7px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaciado entre el icono y el texto */
+  background-color: #28a745; /* Verde llamativo */
+  color: white; /* Texto blanco */
+  border: none; /* Sin bordes */
+  padding: 10px 20px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de la fuente */
+  cursor: pointer; /* Cursor de mano */
+  transition: all 0.3s ease; /* Animación suave */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra inicial */
+}
+
+.save-changes:hover {
+  background-color: #218838; /* Verde más oscuro al pasar el cursor */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+}
+
+.save-changes:active {
+  background-color: #1e7e34; /* Verde más oscuro al hacer clic */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más pequeña */
+  transform: scale(0.98); /* Efecto de presión */
+}
+
+.save-changes:disabled {
+  background-color: #d3d3d3; /* Color gris cuando está deshabilitado */
+  color: #a9a9a9; /* Texto gris claro */
+  cursor: not-allowed; /* Cursor prohibido */
+  box-shadow: none; /* Sin sombra */
+}
+.logout-button {
+  display: flex;
+  margin-top: 30px;
+  margin-left: 7px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaciado entre ícono y texto */
+  background-color: #ce2121; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: none; /* Sin bordes */
+  padding: 10px 20px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de la fuente */
+  cursor: pointer; /* Cursor de mano */
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #a91818; /* Cambio de color al pasar el mouse */
+}
+
+.logout-button:disabled {
+  background-color: #d3d3d3; /* Color gris cuando está deshabilitado */
+  cursor: not-allowed; /* Cursor prohibido */
 }
 
 /* Media Queries para Responsividad */
 @media (max-width: 992px) {
-    .configuracion-usuario-container {
-        flex-direction: column;
-    }
+  .configuracion-usuario-container {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 768px) {
-    .configuracion-content {
-        padding: 20px;
-    }
+  .configuracion-content {
+    padding: 20px;
+  }
 
-    .user-info img {
-        width: 60px; /* Ajuste para dispositivos más pequeños */
-        height: 60px;
-    }
+  .user-info img {
+    width: 60px; /* Ajuste para dispositivos más pequeños */
+    height: 60px;
+  }
 }

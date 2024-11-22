@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import AppLogin from "./pages/Login"; // Componente de login
 import Home from "./pages/home"; // Pantalla de inicio después del login
-import Calendar from "./pages/calendar";
+import Calendar from "./pages/PageCalendar";
 import ConfiguracionPerfil from "./pages/ConfiguracionPerfil"; // Nueva página de configuración de perfil
 import BlankLayout from "./layout/blankLayout";
 import MainLayout from "./layout/mainLayout";
