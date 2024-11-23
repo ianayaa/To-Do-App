@@ -6,7 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { createTheme, TextField } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
 
-const DatePickerBtn = ({ handleSelectDate }) => {
+const DatePickerBtn = ({ handleSelectDate, customIcon }) => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const elegantTheme = createTheme({
     palette: {
@@ -36,11 +36,11 @@ const DatePickerBtn = ({ handleSelectDate }) => {
           root: {
             color: "#fff",
             "&:hover": {
-              backgroundColor: "#ffc247",
+              backgroundColor: "rgba(255, 194, 71, 0.2)",
             },
             "&.Mui-selected": {
               backgroundColor: "#ffc247",
-              color: "#000",
+              color: "#25283d",
               "&:hover": {
                 backgroundColor: "#ffc247",
               },
@@ -53,15 +53,29 @@ const DatePickerBtn = ({ handleSelectDate }) => {
           root: {
             borderRadius: "8px",
             backgroundColor: "transparent",
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255, 255, 255, 0.3)",
+            },
             "&:hover .MuiOutlinedInput-notchedOutline": {
               borderColor: "#ffc247",
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#EBECEC",
+              borderColor: "#ffc247",
             },
           },
           input: {
-            color: "#000",
+            color: "#fff",
+            "&::placeholder": {
+              color: "rgba(255, 255, 255, 0.5)",
+              opacity: 1,
+            },
+          },
+        },
+      },
+      MuiInputAdornment: {
+        styleOverrides: {
+          root: {
+            color: "#fff",
           },
         },
       },
@@ -69,9 +83,34 @@ const DatePickerBtn = ({ handleSelectDate }) => {
         styleOverrides: {
           paper: {
             color: "#fff",
-            border: "1px solid #fff",
             borderRadius: "16px",
             backgroundColor: "#25283d",
+            "& .MuiPickersCalendarHeader-root": {
+              color: "#fff",
+              "& .MuiPickersCalendarHeader-label": {
+                color: "#fff",
+              },
+              "& .MuiSvgIcon-root": {
+                color: "#fff",
+              },
+            },
+            "& .MuiDayCalendar-weekDayLabel": {
+              color: "rgba(255, 255, 255, 0.7)",
+            },
+            "& .MuiPickersYear-yearButton": {
+              color: "#fff",
+              "&.Mui-selected": {
+                backgroundColor: "#ffc247",
+                color: "#25283d",
+              },
+            },
+            "& .MuiPickersMonth-monthButton": {
+              color: "#fff",
+              "&.Mui-selected": {
+                backgroundColor: "#ffc247",
+                color: "#25283d",
+              },
+            },
           },
         },
       },
@@ -80,18 +119,12 @@ const DatePickerBtn = ({ handleSelectDate }) => {
           root: {
             color: "#ffc247",
           },
-          textPrimary: {
-            color: "#ffc247",
-          },
-          textSecondary: {
-            color: "#ffc247",
-          },
         },
       },
       MuiIconButton: {
         styleOverrides: {
           root: {
-            color: "#ffc247",
+            color: "#fff",
             "&:hover": {
               backgroundColor: "rgba(255, 194, 71, 0.1)",
             },
@@ -102,6 +135,16 @@ const DatePickerBtn = ({ handleSelectDate }) => {
         styleOverrides: {
           root: {
             color: "#fff",
+          },
+        },
+      },
+      MuiPickersPopper: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: "#25283d",
+            "& .MuiPickersCalendarHeader-root": {
+              color: "#fff",
+            },
           },
         },
       },
@@ -119,7 +162,31 @@ const DatePickerBtn = ({ handleSelectDate }) => {
         <DatePicker
           value={selectedDate}
           onChange={handleDateChange}
-          renderInput={(params) => <TextField {...params} />}
+          slotProps={{
+            textField: {
+              size: "small",
+              sx: {
+                '& .MuiInputBase-root': {
+                  color: '#fff',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#ffc247',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#ffc247',
+                  },
+                },
+                '& .MuiInputAdornment-root': {
+                  color: '#fff',
+                },
+                '& .MuiSvgIcon-root': {
+                  color: '#fff',
+                },
+              }
+            },
+          }}
         />
       </ThemeProvider>
     </LocalizationProvider>

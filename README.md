@@ -1,48 +1,107 @@
-# To-Do App - Frontend
+# 📋 DoTime - Task Management Application
 
-## Descripción
+<div align="center">
 
-Este repositorio contiene el código fuente de la aplicación web **To-Do**, diseñada para gestionar y organizar tareas de manera eficiente. La aplicación ofrece una interfaz intuitiva y minimalista, donde los usuarios pueden:
+[![Netlify Status](https://api.netlify.com/api/v1/badges/20b76fc5-783b-4f94-82aa-22d1d292eb29/deploy-status)](https://app.netlify.com/sites/silly-semifreddo-4709e3/deploys)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Material-UI](https://img.shields.io/badge/Material--UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)
 
-- Crear, editar, y eliminar tareas.
-- Establecer recordatorios y plazos.
-- Recibir descripciones automáticas y sugerencias para tareas mediante una **API de IA**.
-- Sincronizar las tareas con **Google Calendar**.
-- Filtrar tareas por fecha, hora, y prioridad.
-- Adjuntar archivos a las tareas.
-  
-El front-end está desarrollado con **React**, utilizando **HTML5**, **CSS3**, y **JavaScript** para crear una experiencia fluida y moderna.
+*Una aplicación moderna para la gestión eficiente de tareas y tiempo*
 
-## Características
+[Ver Demo][(DoTime](https://dotime.app))
 
-- **Diseño minimalista**: Interfaz limpia y fácil de usar.
-- **Bilingüe**: Disponible en inglés y español.
-- **Sincronización** con Google Calendar.
-- **IA para sugerencias y descripciones**: Uso de la API de IA para mejorar la productividad del usuario.
-- **Manejo de archivos adjuntos**: Permite a los usuarios agregar archivos a sus tareas.
+</div>
 
-## Tecnologías Utilizadas
+## ✨ Características Principales
 
-- ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB): Biblioteca para construir interfaces de usuario dinámicas.
-- ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white): Lenguaje de marcado para la estructura del sitio web.
-- ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white): Para el diseño y la disposición visual de la aplicación.
-- ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black): Lenguaje de programación para la lógica del front-end.
-- ![API IA](https://img.shields.io/badge/AI_API-000000?style=for-the-badge&logo=ai&logoColor=white): Se utiliza para generar sugerencias automáticas y descripciones de tareas.
-- [![Netlify Status](https://api.netlify.com/api/v1/badges/20b76fc5-783b-4f94-82aa-22d1d292eb29/deploy-status)](https://app.netlify.com/sites/silly-semifreddo-4709e3/deploys)
+🎯 **Gestión Intuitiva de Tareas**
+- Creación, edición y eliminación de tareas con interfaz moderna
+- Sistema de priorización y categorización
+- Comentarios y colaboración en tiempo real
+- Edición de descripciones y detalles de tareas
+- Sistema de comentarios con avatares y diseño moderno
 
-## Requisitos
+📅 **Calendario Integrado**
+- Vista mensual, semanal y diaria con React Big Calendar
+- Visualización completa de tareas en calendario
+- Recordatorios y notificaciones
+- Drag & Drop para reorganizar tareas
 
-Para ejecutar el front-end del proyecto, asegúrate de tener instalados los siguientes requisitos:
+🔍 **Búsqueda y Filtros Avanzados**
+- Filtrado por estado, fecha y prioridad
+- Búsqueda en tiempo real
+- Organización por etiquetas
+- Vista de tareas pendientes y completadas
 
-- **Node.js** (v14 o superior)
-- **npm** (v6 o superior)
+🎨 **Interfaz Moderna**
+- Diseño responsive y adaptativo
+- Barra de navegación superior mejorada
+- Animaciones fluidas y transiciones suaves
+- Diseño minimalista y profesional
 
-## Instalación
+## 🛠️ Tecnologías
 
-Sigue estos pasos para configurar y ejecutar el front-end localmente:
+- **Frontend Framework:** React 18
+- **UI Library:** Material-UI (MUI)
+- **Estado Global:** React Context + Hooks
+- **Backend:** Firebase
+- **Base de Datos:** Firestore
+- **Autenticación:** Firebase Auth
+- **Calendario:** React Big Calendar
+- **Iconos:** FontAwesome
+- **Despliegue:** Netlify
 
-1. Clona el repositorio:
+## 📱 Funcionalidades Principales
 
-   ```bash
-   git clone https://github.com/tu-usuario/to-do-app-frontend.git
-   cd to-do-app-frontend
+### Gestión de Tareas
+- ✏️ Crear, editar y eliminar tareas
+- 📅 Asignar fechas y prioridades
+- 📝 Añadir descripciones detalladas
+- 💬 Sistema de comentarios colaborativo
+- 🏷️ Etiquetas personalizables
+- 📎 Adjuntar archivos a tareas
+- ⚡ Actualizaciones en tiempo real
+
+### Calendario
+- 📊 Vista mensual interactiva
+- 🔄 Arrastrar y soltar tareas
+- 👁️ Visualización de eventos
+- 🔍 Filtros de vista
+- 📱 Responsive en todos los dispositivos
+- 🎯 Vista de objetivos diarios
+- 🔔 Recordatorios integrados
+
+### Sistema de Comentarios
+- ⚡ Comentarios en tiempo real
+- 👤 Avatares de usuarios
+- 🗑️ Eliminación de comentarios propios
+- 🎨 Diseño moderno y responsive
+- 📨 Notificaciones de nuevos comentarios
+- 📝 Editor de texto enriquecido
+
+## 🔑 Características de Seguridad
+
+- 🔐 Autenticación segura con Firebase
+- 🛡️ Protección de rutas
+- ✅ Validación de datos en tiempo real
+- 👥 Permisos basados en roles de usuario
+- 🔒 Encriptación de datos sensibles
+- 📝 Registro de actividades
+
+## 👥 Desarrolladores
+
+- **Ivan Anaya** - *Desarrollador Full Stack*
+- **Eric Rojas** - *Desarrollador Full Stack*
+- **Alexis Gonzalez** - *Desarrollador Front-End & UI/UX Design*
+- **Isaac peña** - *Desarrollador Front-End & UI/UX Design*
+
+## 📞 Contacto
+
+- 📧 Email:
+
+---
+
+<div align="center">
+<p>Hecho con ❤️ por UNIVA STUDENTS </p>
+</div>

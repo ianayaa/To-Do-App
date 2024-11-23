@@ -73,7 +73,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskFromParent }) => {
+const TaskDetailDialog = ({ open, onClose, task, db }) => {
     const [user] = useAuthState(auth);
     const { 
         deleteTask, 
@@ -152,10 +152,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
             
             // Cerrar el diálogo principal después de un breve delay
             setTimeout(() => {
-                handleClose();
-                if (deleteTaskFromParent) {
-                    deleteTaskFromParent(task.id);
-                }
+                onClose();
             }, 1500);
         } catch (err) {
             console.error("Error al eliminar la tarea:", err);
@@ -277,7 +274,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
         <>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={onClose}
                 fullWidth
                 maxWidth="sm"
                 TransitionComponent={Transition}
@@ -313,7 +310,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                         </Typography>
                     </Box>
                     <IconButton
-                        onClick={handleClose}
+                        onClick={onClose}
                         sx={{
                             color: 'white',
                             '&:hover': {
@@ -416,9 +413,9 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                         fullWidth
                                         multiline
                                         rows={4}
+                                        variant="outlined"
                                         value={editedDescription}
                                         onChange={(e) => setEditedDescription(e.target.value)}
-                                        variant="outlined"
                                         placeholder="Escribe la descripción de la tarea..."
                                         sx={{ mb: 2 }}
                                     />
@@ -426,16 +423,15 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                         <Button
                                             onClick={handleCancelEdit}
                                             disabled={savingDescription}
-                                            color="inherit"
+                                            startIcon={<CloseIcon />}
                                         >
                                             Cancelar
                                         </Button>
                                         <Button
                                             onClick={handleSaveDescription}
                                             disabled={savingDescription}
+                                            startIcon={<SaveIcon />}
                                             variant="contained"
-                                            color="primary"
-                                            startIcon={savingDescription ? <CircularProgress size={20} /> : <SaveIcon />}
                                         >
                                             Guardar
                                         </Button>
@@ -552,14 +548,16 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                         {/* Campo de comentarios fijo */}
                         <Box 
                             sx={{ 
-                                position: "absolute",
+                                position: "sticky",
                                 bottom: 0,
                                 left: 0,
-                                right: "16px", // Compensar el pr: 2 del contenedor padre
+                                right: "16px",
                                 backgroundColor: "#F9F7F3",
                                 pt: 2,
                                 display: "flex",
-                                gap: 2
+                                gap: 2,
+                                justifyContent: "space-between",
+                                alignItems: "center"
                             }}
                         >
                             <TextField
@@ -582,7 +580,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                 onClick={handleEnviarComentario}
                                 disabled={!comentario.trim()}
                                 sx={{
-                                    marginLeft: "8px",
                                     padding: 0,
                                     minWidth: "auto",
                                     display: "flex",

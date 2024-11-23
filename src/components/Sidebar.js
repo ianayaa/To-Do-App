@@ -7,15 +7,20 @@ import {
   useTheme,
   Box,
   CssBaseline,
-  Toolbar,
+  Typography,
+  Divider,
   IconButton,
   List,
-  Divider,
-  Typography,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListItemAvatar,
   Avatar,
+  Badge,
+  Toolbar,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
@@ -28,10 +33,10 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
-import Badge from "@mui/material/Badge";
-import Tooltip from "@mui/material/Tooltip";
 import { db } from "../config/firebase";
 import useNotifications from "../hooks/notifications/useNotifications";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Logo from '../assets/To-Do-Logo.png';
 
 const drawerWidth = 240;
 
@@ -40,6 +45,17 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
+  background: 'transparent',
+  backgroundColor: 'transparent',
+  boxShadow: 'none',
+  '& .MuiAppBar-root': {
+    background: 'transparent',
+    backgroundColor: 'transparent',
+  },
+  '& .MuiToolbar-root': {
+    background: 'transparent',
+    backgroundColor: 'transparent',
+  },
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -52,9 +68,6 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-  backgroundColor: "#f9f7f3",
-  boxShadow: "none",
-  color: "#25283d",
 }));
 
 const Drawer = styled(MuiDrawer, {
@@ -64,27 +77,30 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
-  transition: "all 0.3s ease-in-out", // Transición suave
-  ...(open && {
+  "& .MuiDrawer-paper": {
+    backgroundColor: '#25283D',
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    "& .MuiDrawer-paper": {
-      width: drawerWidth,
-      backgroundColor: "#25283d",
-      transition: "all 0.3s ease-in-out", // Transición suave
-    },
-  }),
-  ...(!open && {
-    width: `calc(${theme.spacing(7)} + 1px)`,
-    "& .MuiDrawer-paper": {
-      width: `calc(${theme.spacing(7)} + 1px)`,
-      backgroundColor: "#25283d",
-      transition: "all 0.3s ease-in-out", // Transición suave
-    },
-  }),
+    overflowX: "hidden",
+    ...(open
+      ? {
+          width: drawerWidth,
+          transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+        }
+      : {
+          width: theme.spacing(9),
+          transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }),
+  },
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -102,7 +118,16 @@ export default function Sidebar() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { displayName, loading } = useUserData();
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      console.log("Usuario autenticado:", user);
+      console.log("Nombre del usuario:", user.displayName);
+    }
+  }, [user]);
+
+  const { userData, loading } = useUserData();
   const notifications = useNotifications(db, user);
 
   // Manejo responsivo automático
@@ -137,33 +162,216 @@ export default function Sidebar() {
     navigate("/");
   };
 
+  const handleNotificationClick = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
+  };
+
+  const handleNotificationsClick = () => {
+    console.log('Notificaciones clicadas');
+  };
+
+  const handleProfileClick = () => {
+    console.log('Perfil clicado');
+  };
+
+  const menuItems = [
+    {
+      text: "Tareas",
+      icon: <TaskIcon />,
+      path: "/home",
+      badge: notifications.tasks,
+      tooltip: "Ver todas tus tareas",
+    },
+    {
+      text: "Calendario",
+      icon: <CalendarMonthIcon />,
+      path: "/calendar",
+      badge: notifications.calendar,
+      tooltip: "Ver calendario de tareas",
+    },
+    {
+      text: "Configuración",
+      icon: <SettingsIcon />,
+      path: "/configuracion",
+      tooltip: "Ajustes de la aplicación",
+    },
+    {
+      text: "Soporte y ayuda",
+      icon: <HelpIcon />,
+      path: "/soporte",
+      tooltip: "Obtener ayuda",
+    },
+  ];
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={drawerOpen}>
-        <Toolbar>
+      <AppBar 
+        position="fixed" 
+        open={drawerOpen}
+        sx={{
+          background: 'transparent',
+          backgroundColor: 'transparent',
+          '& .MuiPaper-root': {
+            background: 'transparent',
+            backgroundColor: 'transparent',
+          }
+        }}
+      >
+        <Toolbar
+          sx={{
+            background: 'transparent',
+            backgroundColor: 'transparent'
+          }}
+        >
           <IconButton
             color="inherit"
-            aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
-            onClick={drawerOpen ? handleDrawerClose : handleDrawerOpen}
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
             edge="start"
-            sx={{ marginRight: 5, ...(drawerOpen && { display: "none" }) }}
+            sx={{
+              marginRight: 5,
+              visibility: drawerOpen ? 'hidden' : 'visible',
+              opacity: drawerOpen ? 0 : 1,
+              transition: theme.transitions.create(['visibility', 'opacity'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+              color: '#FFC247',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              },
+            }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
+          <Box
             sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
               flexGrow: 1,
-              fontWeight: "bold",
-              letterSpacing: ".1rem",
-              color: theme.palette.primary.main,
             }}
           >
-            DoTime
-          </Typography>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img 
+                src={Logo} 
+                alt="DoTime Logo" 
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+              />
+            </Box>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{
+                color: '#FFC247',
+                fontWeight: 'bold',
+              }}
+            >
+              DoTime
+            </Typography>
+          </Box>
+          <IconButton
+            color="inherit"
+            onClick={handleNotificationClick}
+            sx={{
+              color: '#FFC247',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              },
+            }}
+          >
+            <Badge badgeContent={notifications.length} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+
+          <Menu
+            anchorEl={notificationAnchorEl}
+            open={Boolean(notificationAnchorEl)}
+            onClose={handleNotificationClose}
+            PaperProps={{
+              elevation: 3,
+              sx: {
+                mt: 1.5,
+                width: 320,
+                maxHeight: 400,
+                backgroundColor: '#25283D',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 1,
+                overflow: 'auto',
+                '& .MuiMenuItem-root': {
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                  py: 1.5,
+                  '&:last-child': {
+                    borderBottom: 'none'
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                  }
+                }
+              }
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+            <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <Typography variant="subtitle1" sx={{ color: '#FFC247', fontWeight: 600 }}>
+                Notificaciones
+              </Typography>
+            </Box>
+            {notifications && notifications.length > 0 ? (
+              notifications.map((notification, index) => (
+                <MenuItem 
+                  key={index}
+                  onClick={handleNotificationClose}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle2" sx={{ color: 'white', mb: 0.5 }}>
+                        {notification.title || 'Nueva notificación'}
+                      </Typography>
+                    }
+                    secondary={
+                      <Box>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          {notification.message || 'Tienes una nueva notificación'}
+                        </Typography>
+                        {notification.time && (
+                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5 }}>
+                            {notification.time}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                  />
+                </MenuItem>
+              ))
+            ) : (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                  No hay notificaciones
+                </Typography>
+              </Box>
+            )}
+          </Menu>
         </Toolbar>
       </AppBar>
 
@@ -171,110 +379,122 @@ export default function Sidebar() {
         variant={windowWidth < 600 ? "temporary" : "permanent"}
         open={drawerOpen}
         onClose={handleDrawerClose}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#25283D',
+            color: 'white',
+          },
+        }}
       >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronLeftIcon sx={{ color: "white" }} />
-            ) : (
-              <ChevronRightIcon sx={{ color: "white" }} />
-            )}
+        <DrawerHeader
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            px: 2.5,
+            position: 'relative',
+            minHeight: 64,
+          }}
+        >
+          <IconButton 
+            onClick={handleDrawerClose}
+            sx={{
+              color: '#FFC247',
+              position: 'absolute',
+              right: 8,
+              visibility: !drawerOpen ? 'hidden' : 'visible',
+              opacity: !drawerOpen ? 0 : 1,
+              transition: theme.transitions.create(['visibility', 'opacity'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+              '&:hover': {
+                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              },
+            }}
+          >
+            <ChevronLeftIcon />
           </IconButton>
         </DrawerHeader>
-        <Divider />
 
         {user && (
           <Box
             sx={{
-              padding: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: drawerOpen ? "flex-start" : "center",
-              flexDirection: drawerOpen ? "row" : "column",
-              transition: "all 0.3s ease-in-out", // Transición suave para el perfil
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: drawerOpen ? 'flex-start' : 'center',
+              gap: 2,
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              minHeight: 80,
+              p: 2,
             }}
           >
             <Avatar
-              alt={displayName}
-              src={user?.photoURL || ""}
+              alt={user.displayName || 'Usuario'}
+              src={user.photoURL}
               sx={{
-                width: 50,
-                height: 50,
-                marginRight: drawerOpen ? 2 : 0,
-                marginBottom: drawerOpen ? 0 : 1,
+                width: drawerOpen ? 45 : 50,
+                height: drawerOpen ? 45 : 50,
+                border: '2px solid #FFC247',
+                transition: 'all 0.2s ease-in-out',
               }}
             />
             {drawerOpen && (
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "white",
-                  whiteSpace: "normal",
-                  overflowWrap: "break-word",
-                  transition: "all 0.3s ease-in-out", // Transición suave para el nombre
-                }}
-              >
-                {loading ? "Cargando..." : displayName}
-              </Typography>
+              <Box sx={{ minWidth: 0, flex: 1, width: '100%', overflow: 'hidden' }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: 'white',
+                    fontWeight: 600,
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word',
+                    width: '100%',
+                    mb: 0.5
+                  }}
+                >
+                  {user.displayName || 'Usuario'}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-all',
+                    width: '100%'
+                  }}
+                >
+                  {user.email}
+                </Typography>
+              </Box>
             )}
           </Box>
         )}
 
-        <List>
-          {[
-            {
-              text: "Tareas",
-              icon: <TaskIcon />,
-              to: "/home",
-              badge: notifications.tasks,
-              tooltip: "Ver todas tus tareas",
-            },
-            {
-              text: "Calendario",
-              icon: <CalendarMonthIcon />,
-              to: "/calendar",
-              badge: notifications.calendar,
-              tooltip: "Ver calendario de tareas",
-            },
-            {
-              text: "Configuración",
-              icon: <SettingsIcon />,
-              to: "/configuracion",
-              tooltip: "Ajustes de la aplicación",
-            },
-            {
-              text: "Soporte y ayuda",
-              icon: <HelpIcon />,
-              to: "/soporte",
-              tooltip: "Obtener ayuda",
-            },
-            {
-              text: "Cerrar sesión",
-              icon: <LogoutIcon sx={{ color: "#dc3545" }} />,
-              onClick: handleLogout,
-              tooltip: "Cerrar sesión",
-            },
-          ].map(({ text, icon, to, badge, tooltip, onClick }) => (
-            <Tooltip key={text} title={tooltip} placement="right" arrow>
-              <ListItem
-                button
-                component={onClick ? "div" : Link}
-                to={to}
-                onClick={onClick}
-                selected={location.pathname === to}
+        <List sx={{ px: 2, flexGrow: 1 }}>
+          {menuItems.map((item) => (
+            <ListItem
+              key={item.text}
+              disablePadding
+              sx={{
+                display: "block",
+                mb: 1,
+              }}
+            >
+              <ListItemButton
+                component={Link}
+                to={item.path}
+                selected={location.pathname === item.path}
                 sx={{
-                  margin: "5px 0",
+                  minHeight: 48,
                   justifyContent: drawerOpen ? "initial" : "center",
                   px: 2.5,
-                  transition: "background-color 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 194, 71, 0.5)",
+                  borderRadius: 2,
+                  backgroundColor: location.pathname === item.path ? 'rgba(255, 194, 71, 0.1)' : 'transparent',
+                  color: location.pathname === item.path ? '#FFC247' : 'rgba(255, 255, 255, 0.7)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                    color: '#FFC247',
                   },
-                  ...(location.pathname === to && {
-                    border: "2px solid #ffc247",
-                    borderRadius: "5px",
-                    backgroundColor: "rgba(255, 194, 71, 0.7)",
-                  }),
                 }}
               >
                 <ListItemIcon
@@ -282,25 +502,66 @@ export default function Sidebar() {
                     minWidth: 0,
                     mr: drawerOpen ? 3 : "auto",
                     justifyContent: "center",
-                    color: "white",
-                    transition: "color 0.3s ease",
+                    color: 'inherit',
                   }}
                 >
-                  {badge > 0 ? (
-                    <Badge badgeContent={badge} color="error">
-                      {icon}
-                    </Badge>
-                  ) : (
-                    icon
-                  )}
+                  {item.icon}
                 </ListItemIcon>
-                {drawerOpen && (
-                  <ListItemText primary={text} sx={{ color: "white" }} />
-                )}
-              </ListItem>
-            </Tooltip>
+                <ListItemText
+                  primary={item.text}
+                  sx={{
+                    opacity: drawerOpen ? 1 : 0,
+                    '& .MuiTypography-root': {
+                      fontWeight: location.pathname === item.path ? 600 : 400,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
           ))}
         </List>
+
+        <Box sx={{ px: 2, pb: 2 }}>
+          <ListItem
+            disablePadding
+            sx={{
+              display: "block",
+              mb: 1,
+            }}
+          >
+            <ListItemButton
+              onClick={handleLogout}
+              sx={{
+                minHeight: 48,
+                justifyContent: drawerOpen ? "initial" : "center",
+                px: 2.5,
+                borderRadius: 2,
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                  color: '#FFC247',
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: drawerOpen ? 3 : "auto",
+                  justifyContent: "center",
+                  color: 'inherit',
+                }}
+              >
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Cerrar Sesión"
+                sx={{
+                  opacity: drawerOpen ? 1 : 0,
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        </Box>
       </Drawer>
     </Box>
   );
