@@ -23,6 +23,7 @@ import {
   faTags,
   faPlus
 } from "@fortawesome/free-solid-svg-icons";
+import { generateTaskDescription } from "../../services/aiService";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -46,38 +47,16 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
 
     // Detectar cuando el usuario escribe '/'
     if (value.endsWith('/')) {
-      setShowAIHelper(true);
       setIsAILoading(true);
       try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.REACT_APP_CLAUDE_API_KEY,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-3-opus-20240229',
-            max_tokens: 1000,
-            messages: [{
-              role: 'user',
-              content: `Actúa como un asistente de tareas. Basado en esta descripción parcial de tarea: "${value.slice(0, -1)}", sugiere una descripción más detallada y estructurada.`
-            }]
-          })
-        });
-
-        if (!response.ok) throw new Error('Error al obtener sugerencia');
-        
-        const data = await response.json();
-        setTaskDescription(data.content[0].text);
+        const aiDescription = await generateTaskDescription(taskName);
+        setTaskDescription(aiDescription);
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al generar la descripción:', error);
+        // Opcional: Mostrar un mensaje de error al usuario
       } finally {
         setIsAILoading(false);
-        setShowAIHelper(false);
       }
-    } else {
-      setShowAIHelper(false);
     }
   };
 
@@ -195,11 +174,28 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
             rows={4}
             value={taskDescription}
             onChange={handleDescriptionChange}
-            placeholder="Escribe '/' para recibir ayuda de Checkmate"
+            placeholder="Escribe una descripción detallada de la tarea (usa '/' para generar una descripción con IA)"
+            variant="outlined"
+            InputProps={{
+              endAdornment: isAILoading && (
+                <CircularProgress 
+                  size={20} 
+                  sx={{ 
+                    color: '#FFC247',
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }} 
+                />
+              )
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 color: 'white',
-                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
+                '& fieldset': { 
+                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                },
                 '&:hover fieldset': { borderColor: '#FFC247' },
                 '&.Mui-focused fieldset': { borderColor: '#FFC247' },
               },
@@ -207,13 +203,11 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
                 color: 'rgba(255, 255, 255, 0.7)',
                 '&.Mui-focused': { color: '#FFC247' },
               },
-            }}
-            InputProps={{
-              endAdornment: isAILoading && (
-                <Box sx={{ color: '#FFC247', p: 1 }}>
-                  <CircularProgress size={20} sx={{ color: 'inherit' }} />
-                </Box>
-              )
+              '& .MuiInputLabel-outlined': {
+                backgroundColor: '#25283D',
+                paddingLeft: '4px',
+                paddingRight: '4px',
+              },
             }}
           />
 

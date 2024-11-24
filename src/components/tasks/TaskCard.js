@@ -8,9 +8,11 @@ import {
   faCalendarAlt,
   faEllipsisV,
   faCheck,
+  faShare,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 import TaskDetailDialog from "../dialog/TaskDetailDialog";
+import ShareTaskDialog from "../dialog/ShareTaskDialog";
 import { db } from "../../config/firebase";
 import useUpdateTaskStatus from "../../hooks/tasks/useUpdateTaskStatus";
 import {
@@ -30,6 +32,7 @@ import {
 const TaskCard = ({ task, deleteTask }) => {
   const { titulo, descripcion, dueDate, estado, id } = task;
   const [open, setOpen] = React.useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const { updateTaskStatus } = useUpdateTaskStatus(db);
@@ -60,6 +63,12 @@ const TaskCard = ({ task, deleteTask }) => {
     event.stopPropagation();
     const newStatus = estado === "Completada" ? "Pendiente" : "Completada";
     await updateTaskStatus(id, newStatus);
+  };
+
+  const handleShare = (event) => {
+    event.stopPropagation();
+    setShareDialogOpen(true);
+    handleClose();
   };
 
   const getStatusColor = () => {
@@ -161,6 +170,23 @@ const TaskCard = ({ task, deleteTask }) => {
                   <FontAwesomeIcon icon={faCheck} />
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Compartir tarea">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShareDialogOpen(true);
+                  }}
+                  sx={{ 
+                    color: task.sharedWith?.length > 0 ? "primary.main" : "action.disabled",
+                    '&:hover': {
+                      color: "primary.main",
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon icon={faShare} />
+                </IconButton>
+              </Tooltip>
               <IconButton
                 size="small"
                 onClick={handleClick}
@@ -205,12 +231,25 @@ const TaskCard = ({ task, deleteTask }) => {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        <MenuItem onClick={handleDelete}>Eliminar</MenuItem>
+        <MenuItem onClick={handleShare}>
+          <FontAwesomeIcon icon={faShare} style={{ marginRight: '8px' }} />
+          Compartir
+        </MenuItem>
+        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+          Eliminar
+        </MenuItem>
       </Menu>
 
       <TaskDetailDialog
         open={open}
         onClose={() => setOpen(false)}
+        task={task}
+        db={db}
+      />
+
+      <ShareTaskDialog
+        open={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
         task={task}
         db={db}
       />

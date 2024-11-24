@@ -10,7 +10,6 @@ import useDeleteTask from "../hooks/tasks/useDeleteTask";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faFilter, faTags, faXmark } from "@fortawesome/free-solid-svg-icons";
 import useUserData from "../hooks/user/useUserData";
-import AIAssistant from '../components/assistant/AIAssistant';
 import {
   Box,
   Typography,

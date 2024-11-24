@@ -1,33 +1,34 @@
-const CLAUDE_API_KEY = process.env.REACT_APP_CLAUDE_API_KEY;
-const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export const sendMessage = async (messages) => {
-  try {
-    const response = await fetch(CLAUDE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-opus-20240229',
-        max_tokens: 1000,
-        messages: messages.map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
-      }),
-    });
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
-    if (!response.ok) {
-      throw new Error('Error en la respuesta de la API');
+export const generateTaskDescription = async (taskName) => {
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        
+        const prompt = `Eres CheckMate, un asistente IA experto en gestión de tareas, diseñado para ayudar a los usuarios a organizar mejor su tiempo y proyectos.
+        
+        Como CheckMate, genera una descripción detallada y práctica para la siguiente tarea: "${taskName}".
+        
+        Responde con el siguiente formato:
+        "¡Hola! Soy CheckMate , aquí tienes los pasos para tu tarea:
+        1. [Primer paso]
+        2. [Segundo paso]
+        3. [Tercer paso]
+        4. [Cuarto paso]
+        5. [Quinto paso]
+        
+        ¡Éxito en tu tarea! "
+        
+        - Cada paso debe ser claro y accionable
+        - No uses más de 150 caracteres por paso
+        - Mantén un tono amigable y motivador`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+    } catch (error) {
+        console.error('Error al generar la descripción:', error);
+        throw new Error('No se pudo generar la descripción de la tarea');
     }
-
-    const data = await response.json();
-    return data.content[0].text;
-  } catch (error) {
-    console.error('Error al enviar mensaje a Claude:', error);
-    throw error;
-  }
 };

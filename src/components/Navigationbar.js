@@ -18,52 +18,62 @@ export default function MobileNavigation() {
   };
 
   return (
-    <BottomNavigation
-      sx={{
-        width: "100%",
-        position: "fixed",
-        bottom: 0,
-        backgroundColor: "#25283d",
-      }}
-      value={value}
-      onChange={handleChange}
-    >
-      <BottomNavigationAction
-        label="Tareas"
-        value="/home"
-        icon={<TaskIcon />}
+    <>
+      <div style={{ paddingBottom: "56px" }}>
+        {" "}
+        {/* Deja espacio para el BottomNavigation */}
+        {/* Aquí va el contenido principal de tu página */}
+      </div>
+
+      <BottomNavigation
         sx={{
-          color: value === "/home" ? "#ffc247" : "white",
-          "&.Mui-selected": { color: "#ffc247" },
+          width: "100%",
+          position: "fixed",
+          bottom: 0,
+          backgroundColor: "#25283d",
+          height: "56px", // Altura del BottomNavigation
+          zIndex: 1000, // Asegura que se muestre encima del contenido
         }}
-      />
-      <BottomNavigationAction
-        label="Calendario"
-        value="/calendar"
-        icon={<CalendarMonthIcon />}
-        sx={{
-          color: value === "/calendar" ? "#ffc247" : "white",
-          "&.Mui-selected": { color: "#ffc247" },
-        }}
-      />
-      <BottomNavigationAction
-        label="Configuración"
-        value="/configuracion"
-        icon={<SettingsIcon />}
-        sx={{
-          color: value === "/configuracion" ? "#ffc247" : "white",
-          "&.Mui-selected": { color: "#ffc247" },
-        }}
-      />
-      <BottomNavigationAction
-        label="Soporte"
-        value="/soporte"
-        icon={<HelpIcon />}
-        sx={{
-          color: value === "/soporte" ? "ffc247" : "white",
-          "&.Mui-selected": { color: "#ffc247" },
-        }}
-      />
-    </BottomNavigation>
+        value={value}
+        onChange={handleChange}
+      >
+        <BottomNavigationAction
+          label="Tareas"
+          value="/home"
+          icon={<TaskIcon />}
+          sx={{
+            color: value === "/home" ? "#ffc247" : "white",
+            "&.Mui-selected": { color: "#ffc247" },
+          }}
+        />
+        <BottomNavigationAction
+          label="Calendario"
+          value="/calendar"
+          icon={<CalendarMonthIcon />}
+          sx={{
+            color: value === "/calendar" ? "#ffc247" : "white",
+            "&.Mui-selected": { color: "#ffc247" },
+          }}
+        />
+        <BottomNavigationAction
+          label="Configuración"
+          value="/configuracion"
+          icon={<SettingsIcon />}
+          sx={{
+            color: value === "/configuracion" ? "#ffc247" : "white",
+            "&.Mui-selected": { color: "#ffc247" },
+          }}
+        />
+        <BottomNavigationAction
+          label="Soporte"
+          value="/soporte"
+          icon={<HelpIcon />}
+          sx={{
+            color: value === "/soporte" ? "#ffc247" : "white",
+            "&.Mui-selected": { color: "#ffc247" },
+          }}
+        />
+      </BottomNavigation>
+    </>
   );
 }

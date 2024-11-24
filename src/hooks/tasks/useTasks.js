@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, or } from "firebase/firestore";
 import { useState, useEffect } from "react";
 
 const useTasks = (db, user) => {
@@ -18,10 +18,13 @@ const useTasks = (db, user) => {
 
     console.log('Iniciando suscripción a tareas para usuario:', user.uid);
 
-    // Crear una consulta
+    // Crear una consulta que incluya tareas propias y compartidas
     const q = query(
         collection(db, "tasks"),
-        where("user_id", "==", user.uid)
+        or(
+            where("user_id", "==", user.uid),
+            where("sharedWith", "array-contains", user.uid)
+        )
     );
 
     // Escuchar los cambios en tiempo real
@@ -43,14 +46,17 @@ const useTasks = (db, user) => {
 
         // Crear objeto de tarea con validación de campos
         const task = {
-          id: doc.id,  // ID original del documento
-          docId: doc.id,  // ID para operaciones de Firestore
+          id: doc.id,
+          docId: doc.id,
           descripcion: taskData.descripcion || '',
           titulo: taskData.titulo || '',
           estado: taskData.estado || 'Pendiente',
           tags: Array.isArray(taskData.tags) ? taskData.tags : [],
           dueDate: taskData.dueDate || null,
           user_id: taskData.user_id,
+          sharedWith: taskData.sharedWith || [],
+          isShared: taskData.user_id !== user.uid,
+          canEdit: taskData.user_id === user.uid || (taskData.sharedWith && taskData.sharedWith.includes(user.uid))
         };
 
         console.log('Tarea procesada:', task);
