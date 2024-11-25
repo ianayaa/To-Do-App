@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/faqs.css";
+import "/src/styles/faqs.css";
 import faqs_image from "../../assets/FAQs.jpg";
 import { TextField, IconButton, Collapse, Typography, Box, Chip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
