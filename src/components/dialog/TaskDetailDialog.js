@@ -106,11 +106,13 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
     const parseDueDate = (dueDate) =>
         dueDate && dueDate instanceof Timestamp ? dueDate.toDate() : null;
 
-    const dueDateFormatted = parseDueDate(task.dueDate);
+    const dueDateFormatted = task?.dueDate ? parseDueDate(task.dueDate) : null;
     const isOverdue =
-        dueDateFormatted && dueDateFormatted < new Date() && task.estado === "Pendiente";
+        dueDateFormatted && dueDateFormatted < new Date() && task?.estado === "Pendiente";
 
     const getStatusIcon = () => {
+        if (!task) return null;
+        
         if (task.estado === "Completada")
             return <FontAwesomeIcon icon={faCheckCircle} style={{ color: "green" }} />;
         if (task.estado === "Pendiente") {
@@ -631,7 +633,7 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <FontAwesomeIcon icon={faCalendarAlt} style={{ color: "#CE2121" }} />
                                     <Typography variant="body1">
-                                        {task.dueDate
+                                        {task?.dueDate
                                             ? task.dueDate.toDate().toLocaleDateString("es-ES", {
                                                 year: "numeric",
                                                 month: "short",
@@ -654,7 +656,7 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                                     Etiquetas:
                                 </Typography>
                                 <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                                    {task.tags && task.tags.length > 0 ? (
+                                    {task?.tags && task.tags.length > 0 ? (
                                         task.tags.map((tag, index) => {
                                             const tagConfigs = {
                                                 "Importante": {

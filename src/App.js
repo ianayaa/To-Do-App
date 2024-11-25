@@ -5,28 +5,29 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import AppLogin from "./pages/Login"; // Componente de login
-import Home from "./pages/home"; // Pantalla de inicio después del login
-import Calendar from "./pages/PageCalendar";
-import ConfiguracionPerfil from "./pages/ConfiguracionPerfil"; // Nueva página de configuración de perfil
-import BlankLayout from "./layout/blankLayout";
-import MainLayout from "./layout/mainLayout";
-import FAQ from "./pages/FAQ";
+import "./styles/app.css";
+import Login from "./pages/auth/Login.js";
+import Home from "./pages/dashboard/home.js";
+import Calendar from "./pages/calendar/calendar.js";
+import ProfileSettings from "./pages/settings/ConfiguracionPerfil.js";
+import BlankLayout from "./layout/blankLayout.js";
+import MainLayout from "./layout/mainLayout.js";
+import FAQ from "./pages/help/faq.js";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "./config/firebase"; // Autenticación de Firebase
+import { auth } from "./config/firebase.js";
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ element }) => {
   const navigate = useNavigate();
-  const [user] = useAuthState(auth); // Usa el estado de autenticación de Firebase
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     if (!user) {
-      navigate("/"); // Si no está autenticado, redirigir al login
+      navigate("/");
     }
   }, [user, navigate]);
 
-  return user ? element : null; // Mostrar el componente si está autenticado
+  return user ? element : null;
 };
 
 const App = () => {
@@ -34,13 +35,13 @@ const App = () => {
     <Router>
       <Routes>
         <Route element={<BlankLayout />}>
-          <Route path="/" element={<AppLogin />} />
+          <Route path="/" element={<Login />} />
         </Route>
         <Route element={<PrivateRoute element={<MainLayout />} />}>
           <Route path="/home" element={<Home />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/configuracion" element={<ConfiguracionPerfil />} />
-          <Route path="/soporte" element={<FAQ />} />
+          <Route path="/settings" element={<ProfileSettings />} />
+          <Route path="/help" element={<FAQ />} />
         </Route>
       </Routes>
     </Router>

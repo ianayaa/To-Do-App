@@ -1,7 +1,7 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useCallback } from "react";
 
-const useAddTasks = (db, user) => {
+const useAddTask = (db, user) => {
   const addTask = useCallback(
     async (newTask) => {
       if (!user?.uid) return;
@@ -28,4 +28,4 @@ const useAddTasks = (db, user) => {
   return { addTask };
 };
 
-export default useAddTasks;
+export default useAddTask;

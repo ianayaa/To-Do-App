@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Navbar from "../components/navigation/Navbar";
+import Sidebar from "../components/navigation/Sidebar";
 import { useMediaQuery } from "@mui/material";
-import MobileNavigation from "../components/Navigationbar";
 import { Outlet } from "react-router-dom";
 
 const MainLayout = () => {
@@ -16,7 +16,7 @@ const MainLayout = () => {
   return (
     <div style={{ display: "flex" }}>
       {isMobile ? (
-        <MobileNavigation />
+        <Navbar />
       ) : (
         <Sidebar open={open} toggleDrawer={toggleDrawer} />
       )}
