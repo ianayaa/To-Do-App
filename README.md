@@ -1,168 +1,221 @@
 <div align="center">
 
-![DoTime Banner](https://via.placeholder.com/1200x300/20232a/61dafb?text=DoTime)
+<img src="https://via.placeholder.com/1200x300/0A1A2F/6DEDD6?text=⌚%20DoTime" alt="DoTime Banner">
 
-# ⚡️ DoTime
-
-> *Donde la Productividad Encuentra la Elegancia*
+# ⚡ DoTime
+#### _Gestión de tareas para la nueva generación_
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/20b76fc5-783b-4f94-82aa-22d1d292eb29/deploy-status)](https://app.netlify.com/sites/silly-semifreddo-4709e3/deploys)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Material-UI](https://img.shields.io/badge/Material--UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)
-[![GitHub Stars](https://img.shields.io/github/stars/dotime/dotime?style=for-the-badge)](https://github.com/dotime/dotime/stargazers)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-[📱 Descargar App](https://dotime.app/download) • [🌐 Web App](https://dotime.app) • [📖 Documentación](https://docs.dotime.app) • [💬 Discord](https://discord.gg/dotime)
+<div style="background: linear-gradient(90deg, #6DEDD6 0%, #68B7DD 100%); padding: 20px; border-radius: 10px; margin: 20px 0;">
+
+[🚀 Demo](https://dotime.app) • [📘 Docs](https://docs.dotime.app) • [🎯 Roadmap](https://github.com/dotime/roadmap)
 
 </div>
-
----
-
-<div align="center">
-
-## 🌟 Tu Nuevo Estándar en Gestión de Tareas
-
 </div>
 
-DoTime no es solo otra aplicación de gestión de tareas - es tu compañero digital para alcanzar la máxima productividad con estilo. Diseñada para profesionales modernos que valoran tanto la eficiencia como la estética.
+## 🌈 Overview
+
+DoTime es una aplicación moderna para la gestión de tareas que combina diseño minimalista con potentes funcionalidades. Perfecta para equipos remotos y profesionales que valoran su tiempo.
+
+## ⚡ Tech Stack
 
 <div align="center">
-
-### ✨ Características que te Enamorarán
-
-</div>
-
-<table align="center">
-  <tr>
-    <td align="center" width="33%">
-      <img src="https://via.placeholder.com/150/61dafb/ffffff?text=Tasks" width="100" height="100"><br>
-      <strong>Gestión Intuitiva</strong><br>
-      Interfaz drag & drop con diseño minimalista
-    </td>
-    <td align="center" width="33%">
-      <img src="https://via.placeholder.com/150/61dafb/ffffff?text=Calendar" width="100" height="100"><br>
-      <strong>Calendario Inteligente</strong><br>
-      Visualización y planificación perfecta
-    </td>
-    <td align="center" width="33%">
-      <img src="https://via.placeholder.com/150/61dafb/ffffff?text=Collab" width="100" height="100"><br>
-      <strong>Colaboración Real</strong><br>
-      Trabajo en equipo sin fricciones
-    </td>
-  </tr>
-</table>
-
-## 🚀 Características Premium
-
-<div align="center">
-
-### 📱 Interface Moderna
-
-![Interface Preview](https://via.placeholder.com/800x400/20232a/61dafb?text=Interface+Preview)
-
-</div>
-
-| 🎯 Gestión de Tareas | 📅 Calendario Pro | 🤝 Colaboración | 🎨 Personalización |
-|---------------------|-------------------|-----------------|-------------------|
-| ✨ Creación rápida | 📊 Vista múltiple | 💬 Chat en vivo | 🌗 Modo oscuro/claro |
-| 🏷️ Tags inteligentes | 🔄 Sincronización | 👥 Equipos | 🎨 Temas personalizados |
-| 📎 Archivos adjuntos | 🔔 Recordatorios | 📊 Analytics | 📱 Responsive design |
-| 🔍 Búsqueda avanzada | 📱 Multi-dispositivo | 📈 Reportes | 🌈 Paletas de colores |
-
-## 💫 La Experiencia DoTime
-
-```mermaid
-graph TD
-    A[Usuario] -->|Ingresa| B[Dashboard]
-    B -->|Gestiona| C[Tareas]
-    B -->|Visualiza| D[Calendario]
-    B -->|Colabora| E[Equipo]
-    C -->|Organiza| F[Proyectos]
-    D -->|Planifica| F
-    E -->|Contribuye| F
-    style A fill:#61dafb,stroke:#20232a
-    style B fill:#20232a,stroke:#61dafb
-    style C fill:#61dafb,stroke:#20232a
-    style D fill:#20232a,stroke:#61dafb
-    style E fill:#61dafb,stroke:#20232a
-    style F fill:#20232a,stroke:#61dafb
-```
-
-## 🛠️ Stack Tecnológico de Élite
-
-<div align="center">
-
-### Construido con las Mejores Tecnologías
 
 <table>
   <tr>
     <td align="center" width="96">
-      <img src="https://via.placeholder.com/48/61dafb/ffffff?text=R" width="48" height="48" alt="React" />
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=react" width="48" height="48" alt="React" />
+      </a>
       <br>React 18
     </td>
     <td align="center" width="96">
-      <img src="https://via.placeholder.com/48/ffca28/000000?text=F" width="48" height="48" alt="Firebase" />
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=firebase" width="48" height="48" alt="Firebase" />
+      </a>
       <br>Firebase
     </td>
     <td align="center" width="96">
-      <img src="https://via.placeholder.com/48/0081cb/ffffff?text=M" width="48" height="48" alt="MUI" />
-      <br>Material-UI
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=materialui" width="48" height="48" alt="Material UI" />
+      </a>
+      <br>Material UI
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=ts" width="48" height="48" alt="TypeScript" />
+      </a>
+      <br>TypeScript
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=tailwind" width="48" height="48" alt="Tailwind" />
+      </a>
+      <br>Tailwind
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=vite" width="48" height="48" alt="Vite" />
+      </a>
+      <br>Vite
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=jest" width="48" height="48" alt="Jest" />
+      </a>
+      <br>Jest
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=redux" width="48" height="48" alt="Redux" />
+      </a>
+      <br>Redux
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=netlify" width="48" height="48" alt="Netlify" />
+      </a>
+      <br>Netlify
+    </td>
+    <td align="center" width="96">
+      <a href="#">
+        <img src="https://skillicons.dev/icons?i=git" width="48" height="48" alt="Git" />
+      </a>
+      <br>Git
     </td>
   </tr>
 </table>
 
 </div>
 
-## 👥 Equipo Creativo
+## 🎯 Características
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0;">
+
+<div style="background: #1A2B3E; padding: 20px; border-radius: 10px;">
+
+### 🎨 UI/UX Moderno
+- Diseño minimalista y elegante
+- Temas oscuro/claro
+- Animaciones fluidas
+- Responsive design
+</div>
+
+<div style="background: #1A2B3E; padding: 20px; border-radius: 10px;">
+
+### ⚡ Performance
+- Carga instantánea
+- Actualizaciones en tiempo real
+- Modo offline
+- Sincronización automática
+</div>
+
+<div style="background: #1A2B3E; padding: 20px; border-radius: 10px;">
+
+### 🔧 Funcionalidades
+- Gestión de tareas intuitiva
+- Calendario integrado
+- Filtros avanzados
+- Etiquetas personalizables
+</div>
+
+<div style="background: #1A2B3E; padding: 20px; border-radius: 10px;">
+
+### 🤝 Colaboración
+- Trabajo en equipo
+- Comentarios en tiempo real
+- Compartir proyectos
+- Control de acceso
+</div>
+
+</div>
+
+## 📊 Dashboard
+
+<img src="https://via.placeholder.com/1200x600/1A2B3E/6DEDD6?text=Dashboard" alt="Dashboard Preview" style="border-radius: 10px;">
+
+## 👥 Equipo
 
 <div align="center">
-
-### Mentes Brillantes Detrás de DoTime
 
 <table>
   <tr>
-    <td align="center" width="25%">
-      <img src="https://via.placeholder.com/150/20232a/61dafb?text=IA" style="border-radius:50%"><br>
-      <strong>Ivan Anaya</strong><br>
-      <em>Full Stack Lead</em><br>
-      <a href="https://github.com/ivan">🐱</a> 
-      <a href="https://linkedin.com/in/ivan">👔</a>
+    <td align="center">
+      <img src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads01&accessoriesType=Round&hairColor=Black&facialHairType=BeardMedium&facialHairColor=Black&clotheType=Hoodie&clotheColor=Gray&eyeType=Happy&eyebrowType=Default&mouthType=Smile&skinColor=Light" width="100" style="border-radius: 50%;">
+      <br>
+      <sub><b>Ivan Anaya</b></sub>
+      <br>
+      <sub>Full Stack</sub>
+      <br>
+      <a href="https://github.com/ivan">
+        <img src="https://skillicons.dev/icons?i=github" width="20" height="20">
+      </a>
+      <a href="https://linkedin.com/in/ivan">
+        <img src="https://skillicons.dev/icons?i=linkedin" width="20" height="20">
+      </a>
     </td>
-    <td align="center" width="25%">
-      <img src="https://via.placeholder.com/150/20232a/61dafb?text=ER" style="border-radius:50%"><br>
-      <strong>Eric Rojas</strong><br>
-      <em>Full Stack Dev</em><br>
-      <a href="https://github.com/eric">🐱</a> 
-      <a href="https://linkedin.com/in/eric">👔</a>
+    <td align="center">
+      <img src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortFlat&accessoriesType=Prescription02&hairColor=Brown&facialHairType=Clean&clotheType=CollarSweater&clotheColor=Blue&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light" width="100" style="border-radius: 50%;">
+      <br>
+      <sub><b>Eric Rojas</b></sub>
+      <br>
+      <sub>Full Stack</sub>
+      <br>
+      <a href="https://github.com/eric">
+        <img src="https://skillicons.dev/icons?i=github" width="20" height="20">
+      </a>
+      <a href="https://linkedin.com/in/eric">
+        <img src="https://skillicons.dev/icons?i=linkedin" width="20" height="20">
+      </a>
     </td>
-    <td align="center" width="25%">
-      <img src="https://via.placeholder.com/150/20232a/61dafb?text=AG" style="border-radius:50%"><br>
-      <strong>Alexis González</strong><br>
-      <em>UI/UX Designer</em><br>
-      <a href="https://github.com/alexis">🐱</a> 
-      <a href="https://linkedin.com/in/alexis">👔</a>
+    <td align="center">
+      <img src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=Black&facialHairType=Blank&clotheType=GraphicShirt&clotheColor=White&graphicType=Bear&eyeType=Happy&eyebrowType=Default&mouthType=Smile&skinColor=Light" width="100" style="border-radius: 50%;">
+      <br>
+      <sub><b>Alexis González</b></sub>
+      <br>
+      <sub>UI/UX Designer</sub>
+      <br>
+      <a href="https://github.com/alexis">
+        <img src="https://skillicons.dev/icons?i=github" width="20" height="20">
+      </a>
+      <a href="https://linkedin.com/in/alexis">
+        <img src="https://skillicons.dev/icons?i=linkedin" width="20" height="20">
+      </a>
     </td>
-    <td align="center" width="25%">
-      <img src="https://via.placeholder.com/150/20232a/61dafb?text=IP" style="border-radius:50%"><br>
-      <strong>Isaac Peña</strong><br>
-      <em>Frontend Dev</em><br>
-      <a href="https://github.com/isaac">🐱</a> 
-      <a href="https://linkedin.com/in/isaac">👔</a>
+    <td align="center">
+      <img src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortWaved&accessoriesType=Blank&hairColor=Brown&facialHairType=Clean&clotheType=ShirtVNeck&clotheColor=Red&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light" width="100" style="border-radius: 50%;">
+      <br>
+      <sub><b>Isaac Peña</b></sub>
+      <br>
+      <sub>Frontend Dev</sub>
+      <br>
+      <a href="https://github.com/isaac">
+        <img src="https://skillicons.dev/icons?i=github" width="20" height="20">
+      </a>
+      <a href="https://linkedin.com/in/isaac">
+        <img src="https://skillicons.dev/icons?i=linkedin" width="20" height="20">
+      </a>
     </td>
   </tr>
 </table>
 
 </div>
 
-## 📬 Conecta con Nosotros
+## 📱 Aplicación Móvil
+
+<div align="center">
+<img src="https://via.placeholder.com/300x600/1A2B3E/6DEDD6?text=Mobile" alt="Mobile Preview" style="border-radius: 20px;">
+</div>
+
+## 📬 Contacto
 
 <div align="center">
 
-### ¡Únete a la Comunidad DoTime!
-
-[![Discord](https://img.shields.io/discord/1234567890?style=for-the-badge&logo=discord&logoColor=white&label=DISCORD)](https://discord.gg/dotime)
-[![Twitter Follow](https://img.shields.io/twitter/follow/dotime?style=for-the-badge&logo=twitter&logoColor=white&labelColor=1DA1F2&color=1DA1F2)](https://twitter.com/dotime)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/dotime)
+[![Twitter](https://img.shields.io/badge/Twitter-%231DA1F2.svg?style=for-the-badge&logo=Twitter&logoColor=white)](https://twitter.com/dotime)
 
 📧 [contacto@dotime.app](mailto:contacto@dotime.app)
 
@@ -172,10 +225,16 @@ graph TD
 
 <div align="center">
 
-### Creado con 💙 por UNIVA STUDENTS
+<p>Desarrollado con 💙 por UNIVA STUDENTS</p>
 
-<img src="https://via.placeholder.com/800x100/20232a/61dafb?text=DoTime" style="margin: 20px 0;">
+<div style="margin-top: 20px;">
 
-[Términos](https://dotime.app/terms) • [Privacidad](https://dotime.app/privacy) • [FAQ](https://dotime.app/faq)
+[![Licencia MIT](https://img.shields.io/badge/Licencia-MIT-blue?style=for-the-badge)](LICENSE)
+![Version](https://img.shields.io/badge/Version-1.0.0-green?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Activo-success?style=for-the-badge)
+
+</div>
+
+[Website](https://dotime.app) • [Documentación](https://docs.dotime.app) • [Blog](https://blog.dotime.app)
 
 </div>
