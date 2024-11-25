@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://via.placeholder.com/1200x300/0A1A2F/6DEDD6?text=⌚%20DoTime" alt="DoTime Banner">
+<img src="dotime-banner.svg" alt="DoTime Banner">
 
 # ⚡ DoTime
 #### _Gestión de tareas para la nueva generación_
