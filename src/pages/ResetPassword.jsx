@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmPasswordReset } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../assets/To-Do-Logo.png";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -12,6 +12,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const recaptchaRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -30,6 +31,13 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Verificar reCAPTCHA
+    const recaptchaValue = recaptchaRef.current.getValue();
+    if (!recaptchaValue) {
+      toast.error("Por favor, completa el captcha");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error("Las contraseñas no coinciden");
       return;
@@ -66,6 +74,7 @@ const ResetPassword = () => {
       toast.error(errorMessage);
     } finally {
       setLoading(false);
+      recaptchaRef.current.reset();
     }
   };
 
@@ -73,7 +82,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
         <div className="text-center">
-          <img src={logo} alt="DoTime Logo" className="mx-auto h-16 mb-4" />
+          <img src="/logo192.png" alt="Do-Time Logo" className="mx-auto h-16 mb-4" />
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Restablecer Contraseña
           </h2>
@@ -143,6 +152,14 @@ const ResetPassword = () => {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="flex justify-center">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              theme="light"
+            />
           </div>
 
           <button
