@@ -16,7 +16,6 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Obtener el código de acción de la URL
   const queryParams = new URLSearchParams(location.search);
   const oobCode = queryParams.get("oobCode");
 
@@ -31,7 +30,6 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Verificar reCAPTCHA
     const recaptchaValue = recaptchaRef.current.getValue();
     if (!recaptchaValue) {
       toast.error("Por favor, completa el captcha");
@@ -79,26 +77,28 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div className="min-h-screen bg-blue-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6 transform hover:scale-[1.01] transition-transform duration-300">
         <div className="text-center">
-          <img 
-            src={process.env.PUBLIC_URL + '/logo192.png'} 
-            alt="Do-Time Logo" 
-            className="mx-auto h-16 mb-4"
-          />
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="flex justify-center mb-6">
+            <img 
+              src={process.env.PUBLIC_URL + '/logo192.png'} 
+              alt="Do-Time Logo" 
+              className="h-20 w-auto object-contain"
+            />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
             Restablecer Contraseña
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-sm text-gray-600">
             Ingresa tu nueva contraseña para continuar
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nueva Contraseña
               </label>
               <div className="relative">
@@ -109,8 +109,8 @@ const ResetPassword = () => {
                   type={showPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Ingresa tu nueva contraseña"
+                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                  placeholder="••••••••"
                   required
                 />
                 <button
@@ -119,16 +119,16 @@ const ResetPassword = () => {
                   onClick={() => togglePasswordVisibility("password")}
                 >
                   {showPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
+                    <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirmar Contraseña
               </label>
               <div className="relative">
@@ -139,8 +139,8 @@ const ResetPassword = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Confirma tu nueva contraseña"
+                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                  placeholder="••••••••"
                   required
                 />
                 <button
@@ -149,16 +149,16 @@ const ResetPassword = () => {
                   onClick={() => togglePasswordVisibility("confirm")}
                 >
                   {showConfirmPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
+                    <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   )}
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center -mx-2 mb-4">
             <ReCAPTCHA
               ref={recaptchaRef}
               sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
@@ -169,7 +169,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
               loading ? "opacity-75 cursor-not-allowed" : ""
             }`}
           >
@@ -195,20 +195,20 @@ const ResetPassword = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Actualizando...
+                <span>Actualizando...</span>
               </>
             ) : (
               "Actualizar Contraseña"
             )}
           </button>
 
-          <div className="text-center">
+          <div className="text-center mt-4">
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
+              className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-150 ease-in-out"
             >
-              Volver al inicio de sesión
+              ← Volver al inicio de sesión
             </button>
           </div>
         </form>
