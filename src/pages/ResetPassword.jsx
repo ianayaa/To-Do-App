@@ -4,7 +4,7 @@ import { confirmPasswordReset } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../assets/logo.png";
+import logo from "../assets/To-Do-Logo.png";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
