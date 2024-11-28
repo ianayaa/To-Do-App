@@ -1,7 +1,3 @@
 # https://www.robotstxt.org/robotstxt.html
-
-# Permitir a todos los rastreadores (pero restringir partes específicas)
 User-agent: *
-Disallow: /pages/ConfiguracionPerfil
-Disallow: /api/
-Disallow: /private/
+Disallow:

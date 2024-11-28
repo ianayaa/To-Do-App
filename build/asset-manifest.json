@@ -1,23 +1,26 @@
 {
   "files": {
-    "main.css": "/static/css/main.ba8bfc44.css",
-    "main.js": "/static/js/main.c3e3b187.js",
-    "static/js/453.37753ddd.chunk.js": "/static/js/453.37753ddd.chunk.js",
+    "main.css": "/static/css/main.66d4439d.css",
+    "main.js": "/static/js/main.c8655bf1.js",
+    "static/js/453.4528d904.chunk.js": "/static/js/453.4528d904.chunk.js",
     "static/media/fa-solid-900.ttf": "/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
+    "static/media/FAQs.jpg": "/static/media/FAQs.b961215ed68180048b98.jpg",
     "static/media/fa-brands-400.ttf": "/static/media/fa-brands-400.0ff70dcbf135d859ebf3.ttf",
+    "static/media/To-Do-Logo.png": "/static/media/To-Do-Logo.2203f2ead9186b24a956.png",
     "static/media/fa-solid-900.woff2": "/static/media/fa-solid-900.93f719f4d62bfa3e748c.woff2",
     "static/media/fa-brands-400.woff2": "/static/media/fa-brands-400.bb8d5a145e22822103fb.woff2",
     "static/media/fa-regular-400.ttf": "/static/media/fa-regular-400.17a6e1aebccdbaa39e78.ttf",
     "static/media/fa-regular-400.woff2": "/static/media/fa-regular-400.bc3722686635b5f86132.woff2",
+    "static/media/no-profile-image.webp": "/static/media/no-profile-image.7a6a6c54279a54d1977c.webp",
     "static/media/fa-v4compatibility.ttf": "/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/index.html",
-    "main.ba8bfc44.css.map": "/static/css/main.ba8bfc44.css.map",
-    "main.c3e3b187.js.map": "/static/js/main.c3e3b187.js.map",
-    "453.37753ddd.chunk.js.map": "/static/js/453.37753ddd.chunk.js.map"
+    "main.66d4439d.css.map": "/static/css/main.66d4439d.css.map",
+    "main.c8655bf1.js.map": "/static/js/main.c8655bf1.js.map",
+    "453.4528d904.chunk.js.map": "/static/js/453.4528d904.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ba8bfc44.css",
-    "static/js/main.c3e3b187.js"
+    "static/css/main.66d4439d.css",
+    "static/js/main.c8655bf1.js"
   ]
 }

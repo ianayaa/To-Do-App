@@ -1,8 +1,9 @@
 [
   {
-    "origin": ["http://localhost:3000/", "https://dotime.app/"],
-    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "origin": ["*"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type", "Authorization"]
+    "responseHeader": ["*"],
+    "allowHeaders": ["*"]
   }
 ]
