@@ -82,7 +82,11 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
         <div className="text-center">
-          <img src="/logo192.png" alt="Do-Time Logo" className="mx-auto h-16 mb-4" />
+          <img 
+            src={process.env.PUBLIC_URL + '/logo192.png'} 
+            alt="Do-Time Logo" 
+            className="mx-auto h-16 mb-4"
+          />
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Restablecer Contraseña
           </h2>
