@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { confirmPasswordReset } from "firebase/auth";
+import { confirmPasswordReset, checkActionCode } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,12 +12,34 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [validCode, setValidCode] = useState(false);
   const recaptchaRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const oobCode = queryParams.get("oobCode");
+
+  useEffect(() => {
+    const verifyActionCode = async () => {
+      if (!oobCode) {
+        toast.error("No se proporcionó un código de verificación");
+        navigate("/login");
+        return;
+      }
+
+      try {
+        await checkActionCode(auth, oobCode);
+        setValidCode(true);
+      } catch (error) {
+        console.error("Error al verificar el código:", error);
+        toast.error("El enlace no es válido o ha expirado");
+        navigate("/login");
+      }
+    };
+
+    verifyActionCode();
+  }, [oobCode, navigate]);
 
   const togglePasswordVisibility = (field) => {
     if (field === "password") {
@@ -30,6 +52,11 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!validCode) {
+      toast.error("El enlace no es válido o ha expirado");
+      return;
+    }
+
     const recaptchaValue = recaptchaRef.current.getValue();
     if (!recaptchaValue) {
       toast.error("Por favor, completa el captcha");
@@ -77,88 +104,66 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 space-y-6 transform hover:scale-[1.01] transition-transform duration-300">
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <img 
-              src={process.env.PUBLIC_URL + '/logo192.png'} 
-              alt="Do-Time Logo" 
-              className="h-20 w-auto object-contain"
-            />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
-            Restablecer Contraseña
-          </h2>
-          <p className="text-sm text-gray-600">
-            Ingresa tu nueva contraseña para continuar
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Restablecer Contraseña</h2>
+          <p className="text-gray-600">Ingresa tu nueva contraseña</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            {/* Campo de Nueva Contraseña */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nueva Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                  placeholder="••••••••"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ingresa tu nueva contraseña"
                   required
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => togglePasswordVisibility("password")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
+                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                 </button>
               </div>
             </div>
 
+            {/* Campo de Confirmar Contraseña */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirmar Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                  placeholder="••••••••"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Confirma tu nueva contraseña"
                   required
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => togglePasswordVisibility("confirm")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showConfirmPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
+                  {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-center -mx-2 mb-4">
+          {/* ReCAPTCHA */}
+          <div className="flex justify-center">
             <ReCAPTCHA
               ref={recaptchaRef}
               sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
@@ -166,51 +171,21 @@ const ResetPassword = () => {
             />
           </div>
 
+          {/* Botón de Submit */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-              loading ? "opacity-75 cursor-not-allowed" : ""
-            }`}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span>Actualizando...</span>
-              </>
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                Procesando...
+              </div>
             ) : (
-              "Actualizar Contraseña"
+              "Restablecer Contraseña"
             )}
           </button>
-
-          <div className="text-center mt-4">
-            <button
-              type="button"
-              onClick={() => navigate("/login")}
-              className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-150 ease-in-out"
-            >
-              ← Volver al inicio de sesión
-            </button>
-          </div>
         </form>
       </div>
     </div>
