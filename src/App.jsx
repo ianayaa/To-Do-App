@@ -8,6 +8,8 @@ import {
   useNavigate
 } from "react-router-dom";
 import "./styles/app.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Login from "./pages/auth/Login.jsx";
 import MobileLogin from "./pages/auth/MobileLogin.jsx";
 import Home from "./pages/dashboard/home.jsx";
@@ -16,6 +18,7 @@ import ProfileSettings from "./pages/settings/ConfiguracionPerfil.jsx";
 import BlankLayout from "./layout/blankLayout.jsx";
 import MainLayout from "./layout/mainLayout.jsx";
 import FAQ from "./pages/help/faq.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./config/firebase.js";
 import { useTheme, useMediaQuery } from "@mui/material";
@@ -73,12 +76,14 @@ const App = () => {
 
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route element={<BlankLayout />}>
           <Route 
             path="/" 
             element={user ? <Navigate to="/home" replace /> : <LoginPage />} 
           />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
         <Route element={<PrivateRoute element={<MainLayout />} />}>
           <Route path="/home" element={<Home />} />

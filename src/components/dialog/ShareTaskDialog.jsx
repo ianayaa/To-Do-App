@@ -62,8 +62,6 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
     // Suscribirse a cambios en los usuarios compartidos
     useEffect(() => {
         if (!currentTask?.sharedWith?.length) return;
-
-        console.log('Configurando suscripciones para usuarios compartidos');
         
         const unsubscribes = currentTask.sharedWith.map(sharedUser => {
             return onSnapshot(
@@ -71,12 +69,9 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                 (userDoc) => {
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        if (userData.photoURL !== sharedUser.photoURL) {
-                            console.log('Detectado cambio en foto de usuario compartido:', {
-                                userId: sharedUser.id,
-                                oldPhoto: sharedUser.photoURL,
-                                newPhoto: userData.photoURL
-                            });
+                        // Solo actualizar si la foto realmente cambió y es diferente a la actual
+                        if (userData.photoURL !== sharedUser.photoURL && 
+                            userData.photoURL !== userPhotoUpdates[sharedUser.id]) {
                             setUserPhotoUpdates(prev => ({
                                 ...prev,
                                 [sharedUser.id]: userData.photoURL
@@ -88,14 +83,23 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
         });
 
         return () => {
-            console.log('Limpiando suscripciones de usuarios compartidos');
             unsubscribes.forEach(unsubscribe => unsubscribe());
         };
-    }, [db, currentTask?.sharedWith]);
+    }, [db, currentTask?.id, currentTask?.sharedWith]); // Solo depender del ID y sharedWith
 
     // Aplicar actualizaciones de fotos al currentTask
     useEffect(() => {
         if (Object.keys(userPhotoUpdates).length === 0) return;
+
+        // Verificar si realmente hay cambios antes de actualizar
+        const needsUpdate = currentTask?.sharedWith?.some(
+            user => userPhotoUpdates[user.id] && userPhotoUpdates[user.id] !== user.photoURL
+        );
+
+        if (!needsUpdate) {
+            setUserPhotoUpdates({});
+            return;
+        }
 
         const updatedTask = {
             ...currentTask,
@@ -104,11 +108,6 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                 photoURL: userPhotoUpdates[user.id] || user.photoURL
             }))
         };
-
-        console.log('Aplicando actualizaciones de fotos:', {
-            updates: userPhotoUpdates,
-            newTask: updatedTask
-        });
 
         setCurrentTask(updatedTask);
         setUserPhotoUpdates({});
