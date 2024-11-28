@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmPasswordReset } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../assets/logo.png";
