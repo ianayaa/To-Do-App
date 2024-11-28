@@ -9,7 +9,7 @@ Disallow: /settings
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://tu-dominio.com/sitemap.xml
+Sitemap: https://dotime.app/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 10

@@ -71,11 +71,62 @@ const PrivateRoute = ({ element }) => {
   return element;
 };
 
+// Componente para manejar el título de la página
+const TitleHandler = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const getPageTitle = () => {
+      const path = location.pathname;
+      let title = "Do-Time";
+
+      switch (path) {
+        case "/":
+          title = "Do-Time | Inicio";
+          break;
+        case "/login":
+          title = "Do-Time | Iniciar Sesión";
+          break;
+        case "/register":
+          title = "Do-Time | Registro";
+          break;
+        case "/calendar":
+          title = "Do-Time | Calendario";
+          break;
+        case "/settings":
+          title = "Do-Time | Ajustes";
+          break;
+        case "/faq":
+          title = "Do-Time | FAQ";
+          break;
+        case "/reset-password":
+          title = "Do-Time | Restablecer Contraseña";
+          break;
+        case "/profile":
+          title = "Do-Time | Perfil";
+          break;
+        default:
+          if (path.startsWith("/task/")) {
+            title = "Do-Time | Detalles de Tarea";
+          }
+          break;
+      }
+
+      document.title = title;
+    };
+
+    getPageTitle();
+  }, [location]);
+
+  return null;
+};
+
 const App = () => {
   const [user] = useAuthState(auth);
 
   return (
     <Router>
+      <TitleHandler />
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route element={<BlankLayout />}>
