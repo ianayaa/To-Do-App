@@ -35,6 +35,8 @@ import Typography from '@mui/material/Typography';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import Icon from '@mui/material/Icon';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -104,6 +106,38 @@ function ConfiguracionPerfil() {
     { value: "otro", label: "Otro" },
     { value: "prefiero-no-decirlo", label: "Prefiero no especificar" }
   ];
+
+  const codigosPais = [
+    { codigo: "+52", pais: "México" },
+    { codigo: "+1", pais: "Estados Unidos" },
+    { codigo: "+34", pais: "España" },
+    { codigo: "+57", pais: "Colombia" },
+    { codigo: "+56", pais: "Chile" },
+    { codigo: "+54", pais: "Argentina" },
+    { codigo: "+51", pais: "Perú" },
+    { codigo: "+58", pais: "Venezuela" },
+    { codigo: "+55", pais: "Brasil" },
+    { codigo: "+502", pais: "Guatemala" },
+    { codigo: "+503", pais: "El Salvador" },
+    { codigo: "+504", pais: "Honduras" },
+    { codigo: "+505", pais: "Nicaragua" },
+    { codigo: "+506", pais: "Costa Rica" },
+    { codigo: "+507", pais: "Panamá" },
+    { codigo: "+593", pais: "Ecuador" },
+    { codigo: "+591", pais: "Bolivia" },
+    { codigo: "+595", pais: "Paraguay" },
+    { codigo: "+598", pais: "Uruguay" },
+  ];
+
+  const formatPhoneNumber = (value) => {
+    // Eliminar todo excepto números
+    const number = value.replace(/[^\d]/g, '');
+    
+    // Aplicar formato según la longitud
+    if (number.length <= 3) return number;
+    if (number.length <= 6) return `${number.slice(0, 3)}-${number.slice(3)}`;
+    return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -546,13 +580,62 @@ function ConfiguracionPerfil() {
                   className="input-field"
                 />
               </div>
+
+              <div className="form-group">
+                <label>Correo electrónico</label>
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="input-field disabled"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    color: "rgba(255, 255, 255, 0.7)",
+                    cursor: "not-allowed"
+                  }}
+                />
+              </div>
+
               <div className="form-group">
                 <label>Teléfono</label>
-                <input
-                  type="tel"
+                <PhoneInput
+                  country={'mx'}
                   value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                  className="input-field"
+                  onChange={phone => setTelefono(phone)}
+                  enableSearch={true}
+                  searchPlaceholder="Buscar país..."
+                  inputStyle={{
+                    width: '100%',
+                    height: '40px',
+                    fontSize: '14px',
+                    backgroundColor: '#2a2d42',
+                    border: '1px solid #3f4254',
+                    color: '#fff',
+                    borderRadius: '6px',
+                    padding: '8px 8px 8px 50px'
+                  }}
+                  buttonStyle={{
+                    backgroundColor: '#2a2d42',
+                    border: '1px solid #3f4254',
+                    borderRight: 'none',
+                    borderRadius: '6px 0 0 6px'
+                  }}
+                  dropdownStyle={{
+                    backgroundColor: '#2a2d42',
+                    border: '1px solid #3f4254',
+                    color: '#fff',
+                    top: 'auto',
+                    bottom: '100%'
+                  }}
+                  searchStyle={{
+                    backgroundColor: '#2a2d42',
+                    color: '#fff',
+                    border: '1px solid #3f4254'
+                  }}
+                  containerStyle={{
+                    color: '#fff'
+                  }}
+                  countryCodeEditable={false}
                 />
               </div>
             </div>

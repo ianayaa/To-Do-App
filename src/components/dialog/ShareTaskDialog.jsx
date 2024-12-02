@@ -17,12 +17,14 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
-    Autocomplete
+    Autocomplete,
+    Chip
 } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faUserPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faUserPlus, faTrash, faShare } from '@fortawesome/free-solid-svg-icons';
 import { searchUserByEmail, shareTaskWithUser, removeSharedUser } from '../../services/shareTaskService';
 import { doc, onSnapshot } from 'firebase/firestore';
+import { auth } from '../../config/firebase';
 
 const ShareTaskDialog = ({ open, onClose, task, db }) => {
     const [email, setEmail] = useState('');
@@ -121,28 +123,38 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
 
     // Cargar correos recientes del localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('recentSharedEmails');
-        if (saved) {
-            setRecentEmails(JSON.parse(saved));
+        const savedEmails = localStorage.getItem('recentSharedEmails');
+        if (savedEmails) {
+            setRecentEmails(JSON.parse(savedEmails));
         }
     }, []);
 
     const handleShare = async () => {
-        if (!isValidEmail(email)) {
-            setError('Por favor, ingresa un correo electrónico válido');
-            return;
-        }
-
-        setLoading(true);
-        setError('');
         try {
-            const user = await searchUserByEmail(db, email);
-            if (!user) {
-                setError('No se encontró ningún usuario con este correo electrónico');
+            setError('');
+            setLoading(true);
+
+            if (!isValidEmail(email)) {
+                setError('Correo electrónico inválido');
                 return;
             }
 
-            if (currentTask.sharedWith?.some(sharedUser => sharedUser.id === user.id)) {
+            // Verificar que no sea el correo del usuario actual
+            const currentUserEmail = auth.currentUser?.email;
+            if (email.toLowerCase() === currentUserEmail?.toLowerCase()) {
+                setError('No puedes compartir la tarea contigo mismo');
+                return;
+            }
+
+            const user = await searchUserByEmail(db, email);
+            
+            if (!user) {
+                setError('Usuario no encontrado');
+                return;
+            }
+
+            // Verificar si ya está compartido con este usuario
+            if (currentTask.sharedWith?.some(u => u.email.toLowerCase() === email.toLowerCase())) {
                 setError('Esta tarea ya está compartida con este usuario');
                 return;
             }
@@ -188,29 +200,50 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 2,
+                        borderRadius: '16px',
                         backgroundColor: '#25283D',
-                        color: 'white'
+                        color: 'white',
+                        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
                     }
                 }}
             >
-                <DialogTitle sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    pb: 1
-                }}>
-                    <Typography variant="h6">
-                        Compartir Tarea
-                    </Typography>
+                <DialogTitle 
+                    sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        pb: 1,
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <FontAwesomeIcon 
+                            icon={faShare} 
+                            style={{ 
+                                color: '#FFC247',
+                                fontSize: '1.2rem' 
+                            }} 
+                        />
+                        <Typography 
+                            variant="h6" 
+                            component="div"
+                            sx={{
+                                fontWeight: 600,
+                                color: '#FFC247'
+                            }}
+                        >
+                            Compartir Tarea
+                        </Typography>
+                    </Box>
                     <IconButton
                         onClick={handleClose}
                         size="small"
                         sx={{ 
                             color: 'rgba(255, 255, 255, 0.7)',
+                            transition: 'all 0.2s',
                             '&:hover': {
-                                color: 'white',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                color: '#FFC247',
+                                backgroundColor: 'rgba(255, 194, 71, 0.1)',
                             }
                         }}
                     >
@@ -218,10 +251,17 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent>
+                <DialogContent sx={{ mt: 2 }}>
                     <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            Tarea: {currentTask?.titulo}
+                        <Typography 
+                            variant="subtitle1" 
+                            sx={{ 
+                                mb: 1,
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                fontWeight: 500
+                            }}
+                        >
+                            {currentTask?.titulo}
                         </Typography>
                     </Box>
 
@@ -240,15 +280,27 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label="Correo electrónico"
+                                    placeholder="Ingresa un correo electrónico"
                                     error={!!error}
                                     helperText={error}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             color: 'white',
-                                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
-                                            '&:hover fieldset': { borderColor: '#FFC247' },
-                                            '&.Mui-focused fieldset': { borderColor: '#FFC247' },
+                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            borderRadius: '12px',
+                                            transition: 'all 0.2s',
+                                            '& fieldset': { 
+                                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                                borderWidth: '1px',
+                                            },
+                                            '&:hover fieldset': { 
+                                                borderColor: '#FFC247',
+                                                borderWidth: '1px',
+                                            },
+                                            '&.Mui-focused fieldset': { 
+                                                borderColor: '#FFC247',
+                                                borderWidth: '2px',
+                                            },
                                         },
                                         '& .MuiInputLabel-root': {
                                             color: 'rgba(255, 255, 255, 0.7)',
@@ -256,6 +308,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                                         },
                                         '& .MuiFormHelperText-root': {
                                             color: '#ff6b6b',
+                                            marginLeft: '14px',
                                         },
                                     }}
                                 />
@@ -268,11 +321,17 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                             sx={{
                                 backgroundColor: '#FFC247',
                                 color: '#25283D',
+                                borderRadius: '12px',
+                                minWidth: '50px',
+                                height: '56px',
+                                transition: 'all 0.2s',
                                 '&:hover': {
                                     backgroundColor: '#ffb014',
                                 },
-                                minWidth: '50px',
-                                height: '56px'
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'rgba(255, 194, 71, 0.3)',
+                                    color: 'rgba(37, 40, 61, 0.7)',
+                                }
                             }}
                         >
                             {loading ? (
@@ -283,19 +342,71 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                         </Button>
                     </Box>
 
-                    {currentTask?.sharedWith?.length > 0 && (
-                        <Box>
-                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                                Compartido con:
+                    {/* Correos recientes */}
+                    {recentEmails.length > 0 && (
+                        <Box sx={{ mt: 4 }}>
+                            <Typography 
+                                variant="subtitle2" 
+                                sx={{ 
+                                    mb: 2,
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    fontWeight: 500,
+                                    letterSpacing: '0.5px'
+                                }}
+                            >
+                                Correos recientes
                             </Typography>
-                            <List>
-                                {currentTask.sharedWith.map((user) => (
+                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                {recentEmails.map((recentEmail, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={recentEmail}
+                                        onClick={() => setEmail(recentEmail)}
+                                        sx={{
+                                            bgcolor: 'rgba(255, 255, 255, 0.05)',
+                                            color: 'white',
+                                            borderRadius: '8px',
+                                            transition: 'all 0.2s',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255, 194, 71, 0.1)',
+                                                color: '#FFC247',
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
+
+                    {currentTask?.sharedWith?.length > 0 && (
+                        <Box sx={{ mt: 4 }}>
+                            <Typography 
+                                variant="subtitle2" 
+                                sx={{ 
+                                    mb: 2,
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    fontWeight: 500,
+                                    letterSpacing: '0.5px'
+                                }}
+                            >
+                                Compartido con
+                            </Typography>
+                            <List sx={{ 
+                                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                                borderRadius: '12px',
+                                overflow: 'hidden'
+                            }}>
+                                {currentTask.sharedWith.map((user, index) => (
                                     <ListItem 
                                         key={user.id}
                                         sx={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 1,
-                                            mb: 1,
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255, 255, 255, 0.05)',
+                                            },
+                                            borderBottom: index < currentTask.sharedWith.length - 1 ? 
+                                                '1px solid rgba(255, 255, 255, 0.1)' : 'none',
                                         }}
                                     >
                                         <Avatar 
@@ -304,7 +415,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                                                 mr: 2, 
                                                 bgcolor: '#FFC247',
                                                 width: 40,
-                                                height: 40
+                                                height: 40,
                                             }}
                                         >
                                             {user.displayName?.[0]?.toUpperCase()}
@@ -313,26 +424,32 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                                             primary={user.displayName}
                                             secondary={user.email}
                                             primaryTypographyProps={{
-                                                sx: { color: 'white' }
+                                                sx: { 
+                                                    color: 'white',
+                                                    fontWeight: 500
+                                                }
                                             }}
                                             secondaryTypographyProps={{
-                                                sx: { color: 'rgba(255, 255, 255, 0.7)' }
+                                                sx: { 
+                                                    color: 'rgba(255, 255, 255, 0.5)',
+                                                    fontSize: '0.875rem'
+                                                }
                                             }}
                                         />
-                                        <ListItemSecondaryAction>
-                                            <IconButton
-                                                edge="end"
-                                                onClick={() => handleRemoveShare(user.id)}
-                                                sx={{ 
+                                        <IconButton
+                                            edge="end"
+                                            onClick={() => handleRemoveShare(user.id)}
+                                            sx={{ 
+                                                color: 'rgba(255, 107, 107, 0.7)',
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
                                                     color: '#ff6b6b',
-                                                    '&:hover': {
-                                                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                                                    }
-                                                }}
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
-                                            </IconButton>
-                                        </ListItemSecondaryAction>
+                                                    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                                }
+                                            }}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </IconButton>
                                     </ListItem>
                                 ))}
                             </List>
@@ -349,8 +466,14 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
             >
                 <Alert 
                     onClose={() => setSuccess('')} 
-                    severity="success" 
-                    sx={{ width: '100%' }}
+                    severity="success"
+                    sx={{ 
+                        backgroundColor: '#25283D',
+                        color: '#FFC247',
+                        '& .MuiAlert-icon': {
+                            color: '#FFC247'
+                        }
+                    }}
                 >
                     {success}
                 </Alert>

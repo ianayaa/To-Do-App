@@ -49,8 +49,18 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
 
   const isDueDateValid = dueDate && dueDate instanceof Timestamp;
   const dueDateFormatted = isDueDateValid ? dueDate.toDate() : null;
-  const isOverdue =
-    dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
+
+  const isOverdue = useMemo(() => {
+    if (!dueDateFormatted || estado === "Completada") return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const taskDate = new Date(dueDateFormatted);
+    taskDate.setHours(0, 0, 0, 0);
+    
+    return taskDate.getTime() < today.getTime();
+  }, [dueDateFormatted, estado]);
 
   const getPriorityIcon = (priority) => {
     switch (priority) {

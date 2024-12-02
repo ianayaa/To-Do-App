@@ -15,6 +15,24 @@ function ThemedApp() {
       createTheme({
         palette: {
           mode: prefersDarkMode ? 'dark' : 'light',
+          background: {
+            default: '#fffdfd',
+            paper: '#fffdfd',
+          },
+        },
+        components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              body: {
+                backgroundColor: '#fffdfd',
+                overscrollBehavior: 'none',
+              },
+              html: {
+                backgroundColor: '#fffdfd',
+                overscrollBehavior: 'none',
+              }
+            },
+          },
         },
       }),
     [prefersDarkMode],

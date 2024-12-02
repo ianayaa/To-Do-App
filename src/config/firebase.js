@@ -19,20 +19,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-auth.useDeviceLanguage(); // Usar el idioma del dispositivo
 
-// Initialize other services
-const db = getFirestore(app);
+// Initialize Auth
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
+export const facebookProvider = new FacebookAuthProvider();
+
+// Initialize Firestore
+export const db = getFirestore(app);
+
+// Initialize Storage
 const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
-const facebookProvider = new FacebookAuthProvider();
 
-export { 
-  auth, 
-  db, 
-  storage, 
-  googleProvider, 
-  facebookProvider,
-  app as default 
-};
+export { storage };
+export default app;

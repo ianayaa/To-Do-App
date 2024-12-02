@@ -12,15 +12,18 @@
 
 /* Reset global */
 html, body {
-  height: initial !important;
-  min-height: initial !important;
+  height: 100% !important;
+  min-height: 100vh !important;
   margin: 0;
   padding: 0;
+  background: #fffdfd !important;
+  overscroll-behavior: none;
 }
 
 #root {
-  height: initial !important;
-  min-height: initial !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  background: #fffdfd !important;
 }
 
 body {

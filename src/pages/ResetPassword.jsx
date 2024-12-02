@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { confirmPasswordReset, checkActionCode } from "firebase/auth";
+import { confirmPasswordReset } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,34 +12,13 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [validCode, setValidCode] = useState(false);
   const recaptchaRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Obtener el código de acción de la URL
   const queryParams = new URLSearchParams(location.search);
   const oobCode = queryParams.get("oobCode");
-
-  useEffect(() => {
-    const verifyActionCode = async () => {
-      if (!oobCode) {
-        toast.error("No se proporcionó un código de verificación");
-        navigate("/login");
-        return;
-      }
-
-      try {
-        await checkActionCode(auth, oobCode);
-        setValidCode(true);
-      } catch (error) {
-        console.error("Error al verificar el código:", error);
-        toast.error("El enlace no es válido o ha expirado");
-        navigate("/login");
-      }
-    };
-
-    verifyActionCode();
-  }, [oobCode, navigate]);
 
   const togglePasswordVisibility = (field) => {
     if (field === "password") {
@@ -52,11 +31,7 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validCode) {
-      toast.error("El enlace no es válido o ha expirado");
-      return;
-    }
-
+    // Verificar reCAPTCHA
     const recaptchaValue = recaptchaRef.current.getValue();
     if (!recaptchaValue) {
       toast.error("Por favor, completa el captcha");
@@ -104,65 +79,81 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Restablecer Contraseña</h2>
-          <p className="text-gray-600">Ingresa tu nueva contraseña</p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+        <div className="text-center">
+          <img src="/logo192.png" alt="Do-Time Logo" className="mx-auto h-16 mb-4" />
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Restablecer Contraseña
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Ingresa tu nueva contraseña para continuar
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            {/* Campo de Nueva Contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nueva Contraseña
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Ingresa tu nueva contraseña"
                   required
                 />
                 <button
                   type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => togglePasswordVisibility("password")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                  {showPassword ? (
+                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-5 w-5 text-gray-400" />
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Campo de Confirmar Contraseña */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirmar Contraseña
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Confirma tu nueva contraseña"
                   required
                 />
                 <button
                   type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => togglePasswordVisibility("confirm")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                  {showConfirmPassword ? (
+                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <FaEye className="h-5 w-5 text-gray-400" />
+                  )}
                 </button>
               </div>
             </div>
           </div>
 
-          {/* ReCAPTCHA */}
           <div className="flex justify-center">
             <ReCAPTCHA
               ref={recaptchaRef}
@@ -171,21 +162,51 @@ const ResetPassword = () => {
             />
           </div>
 
-          {/* Botón de Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+              loading ? "opacity-75 cursor-not-allowed" : ""
+            }`}
           >
             {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
-                Procesando...
-              </div>
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Actualizando...
+              </>
             ) : (
-              "Restablecer Contraseña"
+              "Actualizar Contraseña"
             )}
           </button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="text-sm text-indigo-600 hover:text-indigo-500"
+            >
+              Volver al inicio de sesión
+            </button>
+          </div>
         </form>
       </div>
     </div>

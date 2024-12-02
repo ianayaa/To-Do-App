@@ -1,15 +1,3 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Allow: /
-Allow: /login
-Allow: /calendar
-Allow: /faq
-Disallow: /reset-password
-Disallow: /settings
-Disallow: /api/
-
-# Sitemap
-Sitemap: https://dotime.app/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 10
+Disallow:

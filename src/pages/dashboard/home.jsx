@@ -137,22 +137,25 @@ const Home = () => {
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, px: 0 }}>
       <Box sx={{ mb: { xs: 2, sm: 4 }, pl: 0 }}>
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          gutterBottom 
-          sx={{ 
-            fontWeight: '800',
-            color: '#25283D',
-            fontSize: { xs: '1.75rem', sm: '2rem' },
-            textAlign: 'left',
-            width: '100%',
-            pl: 0,
-            ml: 0,
-            mb: 1,
-            letterSpacing: '-0.5px'
-          }}
-        >
+      <Typography 
+  variant="h4" 
+  component="h1" 
+  gutterBottom 
+  sx={(theme) => ({ 
+    fontWeight: '800',
+    color: theme.palette.mode === 'dark' ? '#25283D' : '#25283D',
+    fontSize: { xs: '1.75rem', sm: '2rem' },
+    textAlign: 'left',
+    width: '100%',
+    pl: 0,
+    ml: 0,
+    mb: 1,
+    letterSpacing: '-0.5px',
+    ...(theme.palette.mode === 'dark' && {
+      textShadow: '-.1px 0px 1.5px #f9f7f3;'
+    })
+  })}
+>
           {userLoading ? (
             <CircularProgress size={24} sx={{ mr: 2 }} />
           ) : (

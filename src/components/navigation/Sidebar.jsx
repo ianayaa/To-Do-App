@@ -280,10 +280,13 @@ export default function Sidebar() {
               variant="h6"
               noWrap
               component="div"
-              sx={{
+              sx={(theme) => ({
                 color: "#25283D",
                 fontWeight: "bold",
-              }}
+                ...(theme.palette.mode === 'dark' && {
+                  textShadow: '-.1px 0px 1px #f9f7f3'
+                })
+              })}
             >
               DoTime
             </Typography>

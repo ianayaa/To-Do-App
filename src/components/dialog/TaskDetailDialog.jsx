@@ -698,10 +698,7 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
               }}
             >
               <Box sx={{ mb: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Proyecto:
-                </Typography>
-                <Typography variant="body1">#Tareas</Typography>
+                <Typography variant="body1">Tareas</Typography>
               </Box>
               <Divider />
               <Box sx={{ my: 1 }}>
