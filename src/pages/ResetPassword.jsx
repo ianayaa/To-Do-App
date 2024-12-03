@@ -1,3 +1,14 @@
+/**
+ * @component ResetPassword
+ * @description Componente que maneja el proceso de restablecimiento de contraseña.
+ * Permite a los usuarios establecer una nueva contraseña después de recibir un token de restablecimiento.
+ * 
+ * @example
+ * return (
+ *   <ResetPassword />
+ * )
+ */
+
 import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmPasswordReset } from "firebase/auth";

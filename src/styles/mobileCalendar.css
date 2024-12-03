@@ -1,0 +1,257 @@
+.mobile-calendar {
+  background: linear-gradient(145deg, #2a2d42, #23263a) !important;
+  height: 100vh !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  gap: 8px !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1 !important;
+}
+
+/* Cabecera del calendario */
+.calendar-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 8px 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1100 !important;
+  background: inherit !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.month-title {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #ffc247 0%, #ffad0a 100%);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-transform: capitalize !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Días de la semana */
+.weekdays {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+  position: sticky !important;
+  top: 60px !important;
+  z-index: 1090 !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.weekday {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+}
+
+/* Cuadrícula de días */
+.days-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  flex: 0 0 auto !important;
+}
+
+.day-cell {
+  aspect-ratio: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.day-cell:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.day-cell.selected {
+  background: rgba(255, 194, 71, 0.15) !important;
+  border: 1px solid rgba(255, 194, 71, 0.3) !important;
+}
+
+.day-cell.today {
+  background: rgba(255, 194, 71, 0.1) !important;
+}
+
+.day-number {
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0 !important;
+}
+
+.today .day-number {
+  color: #ffc247 !important;
+  font-weight: 700 !important;
+}
+
+/* Eventos del día */
+.day-events {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin-top: 4px !important;
+}
+
+.event-indicator {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #ffc247 !important;
+}
+
+/* Lista de eventos */
+.events-list {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.event-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.event-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.event-time {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #ffc247 !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 4px !important;
+}
+
+.event-title {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-bottom: 8px !important;
+}
+
+.event-chips {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-top: 4px !important;
+}
+
+.priority-chip {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.priority-chip svg {
+  font-size: 16px !important;
+}
+
+.status-chip {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.priority-high {
+  color: #f44336 !important;
+}
+
+.priority-medium {
+  color: #ff9800 !important;
+}
+
+.priority-low {
+  color: #4caf50 !important;
+}
+
+.selected-date {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  margin: 8px 0 !important;
+  text-transform: capitalize !important;
+  text-align: center !important;
+}
+
+.no-events-message {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  margin: 16px 0 !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.event-card {
+  animation: fadeIn 0.3s ease-out;
+}

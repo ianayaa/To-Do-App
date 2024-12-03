@@ -36,7 +36,9 @@ const useTasks = (db, user) => {
       user_id: taskData.user_id,
       sharedWith: sharedUsers,
       isShared: taskData.user_id !== user.uid,
-      canEdit: taskData.user_id === user.uid || isSharedWithUser
+      canEdit: taskData.user_id === user.uid || isSharedWithUser,
+      fechaInicio: taskData.dueDate || new Date(),
+      fechaFin: taskData.dueDate || new Date()
     };
   }, [user.uid, user.email]);
 

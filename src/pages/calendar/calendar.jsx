@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -25,14 +25,50 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import MobileCalendar from "../../components/calendar/MobileCalendar";
 
 const PageCalendar = () => {
   const [user] = useAuthState(auth);
   const { tasks } = useTasks(db, user);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  const getEventClassName = (task) => {
+  const handleEventClick = useCallback((info) => {
+    setSelectedTask(info.event.extendedProps.task);
+    setOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    setSelectedTask(null);
+  }, []);
+
+  const handleResize = useCallback(() => {
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
+
+  const getStatusIcon = useCallback((status) => {
+    switch (status) {
+      case "Completada":
+        return <CheckCircleIcon fontSize="small" />;
+      case "Pendiente":
+        return <AccessTimeIcon fontSize="small" />;
+      case "En Progreso":
+        return <ErrorIcon fontSize="small" />;
+      default:
+        return null;
+    }
+  }, []);
+
+  const getEventClassName = useCallback((task) => {
+    if (!task) return '';
     if (task.priority === "Alta") return "task-high-priority";
     switch (task.estado) {
       case "Completada":
@@ -44,23 +80,71 @@ const PageCalendar = () => {
       default:
         return "";
     }
-  };
+  }, []);
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "Completada":
-        return <CheckCircleIcon fontSize="small" />;
-      case "Pendiente":
-        return <AccessTimeIcon fontSize="small" />;
-      case "En Progreso":
-        return <ErrorIcon fontSize="small" />;
-      default:
-        return null;
-    }
-  };
-
-  const renderEventContent = (eventInfo) => {
+  const renderEventContent = useCallback((eventInfo) => {
     const task = eventInfo.event.extendedProps.task;
+    const isListView = eventInfo.view.type === 'listWeek' || eventInfo.view.type === 'listMonth';
+
+    if (isListView) {
+      return (
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          width: '100%',
+          py: 1,
+          px: 2,
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: 2,
+          transition: 'background-color 0.3s',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          }
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            flex: 1
+          }}>
+            {task.priority === "Alta" && (
+              <PriorityHighIcon 
+                fontSize="small" 
+                sx={{ color: '#f44336' }}
+              />
+            )}
+            <Typography 
+              sx={{ 
+                fontWeight: task.priority === "Alta" ? 600 : 400,
+                color: task.estado === "Completada" ? "text.disabled" : "text.primary",
+                textDecoration: task.estado === "Completada" ? "line-through" : "none"
+              }}
+            >
+              {task.titulo}
+            </Typography>
+          </Box>
+          
+          <Chip 
+            icon={getStatusIcon(task.estado)}
+            label={task.estado}
+            size="small"
+            sx={{
+              backgroundColor: task.estado === "Completada" 
+                ? 'success.main' 
+                : task.estado === "En Progreso"
+                ? 'warning.main'
+                : 'info.main',
+              color: '#fff',
+              '& .MuiChip-icon': {
+                color: '#fff'
+              }
+            }}
+          />
+        </Box>
+      );
+    }
+
     return (
       <Tooltip
         title={
@@ -72,19 +156,9 @@ const PageCalendar = () => {
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
             border: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
-            <Typography 
-              variant="h6" 
-              component="div" 
-              sx={{ 
-                mb: 2,
-                fontSize: '1rem',
-                fontWeight: 600,
-                color: '#fff'
-              }}
-            >
+            <Typography variant="h6" component="div" sx={{ mb: 2, fontSize: '1rem', fontWeight: 600, color: '#fff' }}>
               {task.titulo}
             </Typography>
-            
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               {getStatusIcon(task.estado)}
               <Chip 
@@ -101,78 +175,6 @@ const PageCalendar = () => {
                 }}
               />
             </Box>
-            
-            {task.priority === "Alta" && (
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1, 
-                mb: 2,
-                backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                padding: '8px 12px',
-                borderRadius: '8px'
-              }}>
-                <PriorityHighIcon sx={{ color: '#f44336' }} fontSize="small" />
-                <Typography 
-                  variant="body2" 
-                  component="span"
-                  sx={{
-                    color: '#f44336',
-                    fontWeight: 500
-                  }}
-                >
-                  Prioridad Alta
-                </Typography>
-              </Box>
-            )}
-            
-            {task.descripcion && (
-              <Box sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                padding: '12px',
-                borderRadius: '8px'
-              }}>
-                <Typography 
-                  variant="caption" 
-                  component="div"
-                  sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    mb: 1,
-                    fontWeight: 500,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    fontSize: '0.7rem'
-                  }}
-                >
-                  Descripción
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    lineHeight: 1.6,
-                    fontSize: '0.875rem',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    maxHeight: '100px',
-                    overflow: 'auto',
-                    '&::-webkit-scrollbar': {
-                      width: '4px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      borderRadius: '4px',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: '4px',
-                    }
-                  }}
-                >
-                  {task.descripcion}
-                </Typography>
-              </Box>
-            )}
           </Box>
         }
         arrow
@@ -199,138 +201,70 @@ const PageCalendar = () => {
         </div>
       </Tooltip>
     );
-  };
+  }, [getStatusIcon, getEventClassName]);
 
-  const events = tasks
-    .filter(task => task && task.dueDate)
-    .map((task) => {
-      const dueDate = task.dueDate?.toDate();
-      if (!dueDate) {
-        console.error('Fecha inválida para la tarea:', task);
-        return null;
+  const calendarEvents = useMemo(() => {
+    if (!tasks || !Array.isArray(tasks)) return [];
+    return tasks.map(task => ({
+      id: task.id,
+      title: task.titulo,
+      start: task.dueDate?.toDate?.(),
+      end: task.dueDate?.toDate?.(),
+      extendedProps: {
+        task: task,
       }
-
-      return {
-        id: task.id,
-        title: task.titulo || 'Sin título',
-        start: dueDate,
-        end: dueDate,
-        allDay: true,
-        className: getEventClassName(task),
-        extendedProps: {
-          task: task
-        }
-      };
-    })
-    .filter(Boolean);
-
-  const handleEventClick = (info) => {
-    setSelectedTask(info.event.extendedProps.task);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedTask(null);
-  };
-
-  const handleDateClick = (arg) => {
-    console.log('Date clicked:', arg.date);
-  };
+    }));
+  }, [tasks]);
 
   return (
     <Fade in={true} timeout={500}>
-      <Box sx={{ height: "calc(100vh - 100px)", p: 3 }}>
-        <Paper 
+      <Box sx={{ p: 3, height: '100vh' }}>
+        <Paper
           elevation={0}
-          sx={{ 
-            height: "100%", 
-            p: 2,
-            borderRadius: "16px",
-            backgroundColor: "#ffffff",
-            overflow: "visible",
-            position: "relative",
-            '& .fc': {
-              '--fc-border-color': '#ebedf0',
-              position: 'relative',
-              zIndex: 1
-            },
-            '& .fc .fc-popover': {
-              zIndex: 10000
-            },
-            '& .fc-popover-body': {
-              zIndex: 10000
-            }
+          sx={{
+            height: '100%',
+            backgroundColor: '#25283D',
+            borderRadius: 4,
+            p: 3,
+            overflow: 'hidden'
           }}
         >
-          <FullCalendar
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              listPlugin,
-              interactionPlugin
-            ]}
-            initialView="dayGridMonth"
-            headerToolbar={{
-              left: "prev,today,next",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-            }}
-            locale={esLocale}
-            events={events}
-            eventContent={renderEventContent}
-            eventClick={handleEventClick}
-            dateClick={handleDateClick}
-            height="100%"
-            dayMaxEventRows={2}
-            moreLinkText={count => `${count} más`}
-            moreLinkClick="popover"
-            views={{
-              timeGridWeek: {
-                dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`
-              },
-              dayGridMonth: {
-                dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`
-              }
-            }}
-            slotDuration="00:30:00"
-            slotMinTime="06:00:00"
-            slotMaxTime="22:00:00"
-            expandRows={true}
-            allDaySlot={false}
-            nowIndicator={true}
-            buttonText={{
-              today: "Hoy",
-              month: "Mes",
-              week: "Semana",
-              day: "Día",
-              list: "Lista"
-            }}
-            eventTimeFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              meridiem: false,
-              hour12: false
-            }}
-            slotLabelFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
-            }}
-            views={{
-              dayGridMonth: {
-                titleFormat: { year: 'numeric', month: 'long' }
-              },
-              timeGridWeek: {
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit' }
-              },
-              timeGridDay: {
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit', weekday: 'long' }
-              }
-            }}
-          />
+          {isMobile ? (
+            <MobileCalendar 
+              events={calendarEvents}
+              onEventClick={(event) => {
+                setSelectedTask(event);
+                setOpen(true);
+              }}
+            />
+          ) : (
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+              }}
+              locale={esLocale}
+              events={calendarEvents}
+              eventContent={renderEventContent}
+              eventClick={handleEventClick}
+              height="100%"
+              views={{
+                listWeek: {
+                  titleFormat: { year: 'numeric', month: 'long', day: 'numeric' },
+                  eventContent: renderEventContent,
+                  noEventsContent: 'No hay tareas programadas'
+                }
+              }}
+              slotLabelFormat={{
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              }}
+            />
+          )}
         </Paper>
         {selectedTask && (
           <TaskDetailDialog

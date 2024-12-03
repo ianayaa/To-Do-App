@@ -69,6 +69,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import AssistantAI from "./AssistantAI.jsx";
+import MobileTaskDetailDialog from "./MobileTaskDetailDialog";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -105,6 +106,16 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
   const [editedDescription, setEditedDescription] = useState("");
   const [savingDescription, setSavingDescription] = useState(false);
   const [openAssistant, setOpenAssistant] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const parseDueDate = (dueDate) =>
     dueDate && dueDate instanceof Timestamp ? dueDate.toDate() : null;
@@ -312,6 +323,23 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
     setConfirmDeleteCommentId(null);
     setCommentDeleteState("initial");
   };
+
+  if (isMobile) {
+    return (
+      <MobileTaskDetailDialog
+        open={open}
+        onClose={onClose}
+        task={task}
+        user={user}
+        comentarios={comentarios}
+        comentario={comentario}
+        setComentario={setComentario}
+        handleEnviarComentario={handleEnviarComentario}
+        handleEliminarComentario={handleEliminarComentario}
+        handleDeleteClick={handleDeleteClick}
+      />
+    );
+  }
 
   return (
     <>
