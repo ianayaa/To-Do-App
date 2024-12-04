@@ -8,7 +8,7 @@ import esLocale from "@fullcalendar/core/locales/es";
 import useTasks from "../../hooks/tasks/useTasks";
 import { auth, db } from "../../config/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import "../../styles/calendar.css";
+import "../../styles/components/calendar/calendar.css";
 import {
   Box,
   Paper,

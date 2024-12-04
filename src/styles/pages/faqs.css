@@ -247,15 +247,100 @@ body {
   }
 
   .faq-container {
-    padding: 1.5rem;
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 0;
+    margin-bottom: 70px;
+  }
+
+  .faq-image {
+    max-width: 200px;
+    margin-bottom: 1.5rem;
+  }
+
+  .faq-container .MuiTypography-h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .faq-container .MuiChip-root {
+    font-size: 0.8rem !important;
+    height: 28px !important;
+  }
+
+  .faq-container .question-box {
+    margin-bottom: 0.8rem;
   }
 
   .faq-container .faq-question {
+    padding: 0.8rem;
     font-size: 0.9rem;
   }
 
   .faq-container .faq-answer {
+    font-size: 0.85rem;
+    padding: 0 0.8rem 0.8rem;
+  }
+
+  .faq-container .MuiTextField-root {
+    margin: 0.5rem 0;
+  }
+
+  .faq-container .MuiOutlinedInput-root {
+    font-size: 0.9rem;
+  }
+
+  /* Ajustes para mejorar el espaciado y la legibilidad */
+  .faq-container .MuiBox-root {
+    gap: 0.8rem !important;
+  }
+
+  /* Mejorar la interactividad táctil */
+  .faq-container .faq-accordion,
+  .faq-container .MuiChip-root,
+  .faq-container .question-box {
+    touch-action: manipulation;
+  }
+
+  .faq-container .faq-accordion:active,
+  .faq-container .question-box:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (max-width: 375px) {
+  .faq-container {
+    padding: 0.8rem;
+  }
+
+  .faq-image {
+    max-width: 180px;
+  }
+
+  .faq-container .faq-question {
+    font-size: 0.85rem;
+  }
+
+  .faq-container .faq-answer {
     font-size: 0.8rem;
+  }
+
+  .faq-container .MuiChip-root {
+    font-size: 0.75rem !important;
+    height: 24px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .faq-container .question-box,
+  .faq-container .MuiChip-root {
+    transform: none;
+    transition: transform 0.2s ease;
+  }
+
+  .faq-container .question-box:hover {
+    transform: none;
   }
 }
 
@@ -302,14 +387,4 @@ body {
 
 .faq-answer-enter {
   animation: slideDown 0.3s ease forwards;
-}
-
-@media (max-width: 768px) {
-  .faq-container {
-    padding: 1rem;
-  }
-
-  .faq-image {
-    max-width: 200px;
-  }
 }

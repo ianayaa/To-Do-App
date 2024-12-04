@@ -8,7 +8,7 @@ import {
   updatePassword,
   sendPasswordResetEmail 
 } from 'firebase/auth';
-import "../../styles/configUsuario.css"; // CSS global
+import "../../styles/pages/configUsuario.css"; // CSS global
 import useUserData from "../../hooks/user/useUserData";
 import { useNavigate } from "react-router-dom";
 import useUpdateUserData from "../../hooks/user/useUpdateUserData";
@@ -76,7 +76,6 @@ function ConfiguracionPerfil() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState('success');
 
-  // Estados para el cambio de contraseña
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -91,7 +90,6 @@ function ConfiguracionPerfil() {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [resetError, setResetError] = useState('');
 
-  // Get the login provider
   const isPasswordProvider = user?.providerData[0]?.providerId === 'password';
   const loginProvider = user?.providerData[0]?.providerId;
 
@@ -130,10 +128,7 @@ function ConfiguracionPerfil() {
   ];
 
   const formatPhoneNumber = (value) => {
-    // Eliminar todo excepto números
     const number = value.replace(/[^\d]/g, '');
-    
-    // Aplicar formato según la longitud
     if (number.length <= 3) return number;
     if (number.length <= 6) return `${number.slice(0, 3)}-${number.slice(3)}`;
     return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
@@ -176,21 +171,18 @@ function ConfiguracionPerfil() {
         telefono,
       };
 
-      console.log('Guardando cambios:', updatedData);
       await updateUserData(updatedData);
       
       setAlertMessage("Datos actualizados con éxito.");
       setAlertSeverity('success');
       setOpenAlert(true);
     } catch (error) {
-      console.error('Error al guardar cambios:', error);
       setAlertMessage("Error al actualizar los datos: " + error.message);
       setAlertSeverity('error');
       setOpenAlert(true);
     }
   };
 
-  // Función para manejar la selección inicial de la imagen
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith("image/")) {
@@ -208,7 +200,6 @@ function ConfiguracionPerfil() {
     reader.readAsDataURL(file);
   };
 
-  // Función para cargar la imagen cuando se complete
   const onImageLoad = (e) => {
     const { width, height } = e.target;
     const initialCrop = {
@@ -225,7 +216,6 @@ function ConfiguracionPerfil() {
     imgRef.current = e.target;
   };
 
-  // Función para generar la vista previa
   const generatePreview = async () => {
     if (!completedCrop || !imgRef.current || !previewCanvasRef.current) return;
 
@@ -253,7 +243,6 @@ function ConfiguracionPerfil() {
     );
   };
 
-  // Función para subir la imagen recortada
   const handleUpload = async () => {
     if (!completedCrop || !imgRef.current) {
       setAlertMessage("Por favor, selecciona y recorta la imagen primero.");
@@ -269,16 +258,13 @@ function ConfiguracionPerfil() {
 
       setIsUploading(true);
 
-      // Crear un canvas con la imagen recortada
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const image = imgRef.current;
 
-      // Calcular las dimensiones reales basadas en porcentajes
       const scaleX = image.naturalWidth / 100;
       const scaleY = image.naturalHeight / 100;
 
-      // Convertir valores de porcentaje a píxeles
       const pixelCrop = {
         x: (completedCrop.x * image.naturalWidth) / 100,
         y: (completedCrop.y * image.naturalHeight) / 100,
@@ -286,11 +272,9 @@ function ConfiguracionPerfil() {
         height: (completedCrop.height * image.naturalHeight) / 100
       };
 
-      // Establecer las dimensiones del canvas
       canvas.width = pixelCrop.width;
       canvas.height = pixelCrop.height;
 
-      // Dibujar la imagen recortada
       ctx.drawImage(
         image,
         pixelCrop.x,
@@ -303,30 +287,22 @@ function ConfiguracionPerfil() {
         pixelCrop.height
       );
 
-      // Convertir el canvas a Blob
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
       const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
 
-      // Subir a Firebase Storage
       const timestamp = Date.now();
       const fileName = `${user.uid}_${timestamp}.jpg`;
       const filePath = `profilePictures/${fileName}`;
       const storageRef = ref(storage, filePath);
 
-      console.log('Subiendo imagen a Storage...');
       const uploadResult = await uploadBytes(storageRef, file);
-      console.log('Imagen subida, obteniendo URL...');
       const downloadURL = await getDownloadURL(uploadResult.ref);
-      console.log('URL obtenida:', downloadURL);
 
-      // Actualizar perfil usando el hook
-      console.log('Actualizando datos de usuario...');
       await updateUserData({
         photoURL: downloadURL,
         lastPhotoUpdate: timestamp
       });
 
-      // Limpiar estado
       setSelectedImage(null);
       setOpenImageEditor(false);
       resetCrop();
@@ -335,7 +311,6 @@ function ConfiguracionPerfil() {
       setAlertSeverity('success');
       setOpenAlert(true);
     } catch (error) {
-      console.error("Error completo:", error);
       setAlertMessage("Error al subir la imagen: " + error.message);
       setAlertSeverity('error');
       setOpenAlert(true);
@@ -344,9 +319,7 @@ function ConfiguracionPerfil() {
     }
   };
 
-  // Función para manejar cambios en el crop
   const onCropChange = (newCrop, percentCrop) => {
-    // Asegurarse de que todos los valores sean números válidos
     const validatedCrop = {
       unit: '%',
       width: Math.max(0, percentCrop.width || 0),
@@ -359,9 +332,7 @@ function ConfiguracionPerfil() {
     setCrop(validatedCrop);
   };
 
-  // Función para manejar el crop completado
   const onCropComplete = (crop, percentCrop) => {
-    // Asegurarse de que todos los valores sean números válidos
     const validatedCrop = {
       unit: '%',
       width: Math.max(0, percentCrop.width || 0),
@@ -374,7 +345,6 @@ function ConfiguracionPerfil() {
     setCompletedCrop(validatedCrop);
   };
 
-  // Función para reiniciar el crop
   const resetCrop = () => {
     const defaultCrop = {
       unit: '%',
@@ -405,42 +375,37 @@ function ConfiguracionPerfil() {
     try {
       setPasswordError("");
 
-      // Validar que todos los campos estén llenos
       if (!currentPassword || !newPassword || !confirmPassword) {
         setPasswordError("Por favor, completa todos los campos");
         return;
       }
 
-      // Validar que la nueva contraseña cumpla con los requisitos
       if (!Object.values(passwordValidation).every(Boolean)) {
         setPasswordError("La nueva contraseña no cumple con los requisitos mínimos");
         return;
       }
 
-      // Validar que las contraseñas coincidan
       if (newPassword !== confirmPassword) {
         setPasswordError("Las contraseñas no coinciden");
         return;
       }
 
-      // Reautenticar al usuario
       const credential = EmailAuthProvider.credential(
         user.email,
         currentPassword
       );
       await reauthenticateWithCredential(user, credential);
 
-      // Cambiar la contraseña
       await updatePassword(user, newPassword);
 
-      // Limpiar estados y mostrar mensaje de éxito
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setOpenPasswordModal(false);
-      showAlert("Contraseña actualizada con éxito", "success");
+      setAlertMessage("Contraseña actualizada con éxito");
+      setAlertSeverity('success');
+      setOpenAlert(true);
     } catch (error) {
-      console.error("Error al cambiar la contraseña:", error);
       if (error.code === 'auth/wrong-password') {
         setPasswordError("La contraseña actual es incorrecta");
       } else {
@@ -459,13 +424,11 @@ function ConfiguracionPerfil() {
       await sendPasswordResetEmail(auth, user.email);
       setResetEmailSent(true);
       setResetError('');
-      // Cerrar el modal de cambio de contraseña después de 3 segundos
       setTimeout(() => {
         setOpenPasswordModal(false);
         setResetEmailSent(false);
       }, 3000);
     } catch (error) {
-      console.error('Error al enviar correo de restablecimiento:', error);
       switch (error.code) {
         case 'auth/too-many-requests':
           setResetError('Has intentado restablecer tu contraseña demasiadas veces. Por favor, intenta más tarde.');
@@ -537,7 +500,6 @@ function ConfiguracionPerfil() {
         </div>
 
         <div className="profile-section">
-          {/* Columna Izquierda */}
           <div className="left-column">
             <div className="user-info">
               <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
@@ -641,7 +603,6 @@ function ConfiguracionPerfil() {
             </div>
           </div>
 
-          {/* Columna Derecha */}
           <div className="right-column">
             <div className="info-section">
               <div className="form-group">
@@ -677,7 +638,6 @@ function ConfiguracionPerfil() {
                 </div>
               </div>
 
-              {/* Botón de cambio de contraseña */}
               <div className="form-group">
                 {!isPasswordProvider ? (
                   <div className="password-provider-notice">
@@ -706,7 +666,6 @@ function ConfiguracionPerfil() {
           </div>
         </div>
 
-        {/* Modal para editar imagen */}
         <Modal
           open={openImageEditor}
           onClose={handleCloseImageEditor}
@@ -876,7 +835,6 @@ function ConfiguracionPerfil() {
           </Box>
         </Modal>
 
-        {/* Modal de cambio de contraseña */}
         <Dialog 
           open={openPasswordModal} 
           onClose={() => setOpenPasswordModal(false)}
@@ -1162,7 +1120,6 @@ function ConfiguracionPerfil() {
           </DialogActions>
         </Dialog>
 
-        {/* Snackbar para alertas */}
         <Snackbar
           open={openAlert}
           autoHideDuration={4000}

@@ -55,8 +55,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
-import useComments from "../../hooks/comments/useComments";
-import useDeleteComment from "../../hooks/comments/useDeleteComment";
+import useComments from "../../hooks/features/comments/useComments";
+import useDeleteComment from "../../hooks/features/comments/useDeleteComment";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
@@ -68,7 +68,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import AssistantAI from "./AssistantAI.jsx";
+import AssistantAI from "../services/assistant/AssistantAI.jsx";
 import MobileTaskDetailDialog from "./MobileTaskDetailDialog";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -561,91 +561,93 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                   </Typography>
                 ) : (
                   <List>
-                    {comentarios.map((com) => (
-                      <ListItem
-                        key={com.id}
-                        alignItems="flex-start"
-                        sx={{
-                          backgroundColor: "#fff",
-                          borderRadius: 1,
-                          mb: 1,
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                          p: 2,
-                        }}
-                      >
-                        <Box sx={{ display: "flex", width: "100%" }}>
-                          <Avatar
-                            alt={com.userName}
-                            src={com.userPhoto}
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              mr: 2,
-                              bgcolor: !com.userPhoto ? "#1976d2" : "inherit",
-                            }}
-                          >
-                            {!com.userPhoto &&
-                              com.userName?.charAt(0).toUpperCase()}
-                          </Avatar>
-                          <Box sx={{ flex: 1 }}>
-                            <Box
+                    {comentarios
+                      .filter((com) => !com.texto.includes("IA"))
+                      .map((com) => (
+                        <ListItem
+                          key={com.id}
+                          alignItems="flex-start"
+                          sx={{
+                            backgroundColor: "#fff",
+                            borderRadius: 1,
+                            mb: 1,
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                            p: 2,
+                          }}
+                        >
+                          <Box sx={{ display: "flex", width: "100%" }}>
+                            <Avatar
+                              alt={com.userName}
+                              src={com.userPhoto}
                               sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
+                                width: 40,
+                                height: 40,
+                                mr: 2,
+                                bgcolor: !com.userPhoto ? "#1976d2" : "inherit",
                               }}
                             >
+                              {!com.userPhoto &&
+                                com.userName?.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Box sx={{ flex: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Typography
+                                  component="span"
+                                  variant="subtitle2"
+                                  color="primary"
+                                >
+                                  {com.userName}
+                                </Typography>
+                                {com.userId === user.uid && (
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      handleEliminarComentario(com.id)
+                                    }
+                                    disabled={loadingDeleteComment}
+                                    sx={{
+                                      color: "#757575",
+                                      "&:hover": {
+                                        color: "#d32f2f",
+                                      },
+                                    }}
+                                  >
+                                    {loadingDeleteComment ? (
+                                      <CircularProgress
+                                        size={16}
+                                        color="inherit"
+                                      />
+                                    ) : (
+                                      <FontAwesomeIcon icon={faTrash} />
+                                    )}
+                                  </IconButton>
+                                )}
+                              </Box>
                               <Typography
                                 component="span"
-                                variant="subtitle2"
-                                color="primary"
+                                variant="body2"
+                                color="text.primary"
+                                sx={{ display: "block", my: 0.5 }}
                               >
-                                {com.userName}
+                                {com.texto}
                               </Typography>
-                              {com.userId === user.uid && (
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    handleEliminarComentario(com.id)
-                                  }
-                                  disabled={loadingDeleteComment}
-                                  sx={{
-                                    color: "#757575",
-                                    "&:hover": {
-                                      color: "#d32f2f",
-                                    },
-                                  }}
-                                >
-                                  {loadingDeleteComment ? (
-                                    <CircularProgress
-                                      size={16}
-                                      color="inherit"
-                                    />
-                                  ) : (
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  )}
-                                </IconButton>
-                              )}
+                              <Typography
+                                component="span"
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {com.fecha.toDate().toLocaleString()}
+                              </Typography>
                             </Box>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.primary"
-                              sx={{ display: "block", my: 0.5 }}
-                            >
-                              {com.texto}
-                            </Typography>
-                            <Typography
-                              component="span"
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {com.fecha.toDate().toLocaleString()}
-                            </Typography>
                           </Box>
-                        </Box>
-                      </ListItem>
-                    ))}
+                        </ListItem>
+                      ))}
                   </List>
                 )}
               </Box>

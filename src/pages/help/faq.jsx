@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/faqs.css";
+import "../../styles/pages/faqs.css";
 import FAQsImage from "../../assets/FAQs.jpg";
 import {
   TextField,

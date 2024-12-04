@@ -2,17 +2,12 @@
  * @component ResetPassword
  * @description Componente que maneja el proceso de restablecimiento de contraseña.
  * Permite a los usuarios establecer una nueva contraseña después de recibir un token de restablecimiento.
- * 
- * @example
- * return (
- *   <ResetPassword />
- * )
  */
 
 import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmPasswordReset } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth } from "../../config/firebase";
 import { toast } from "react-toastify";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -27,7 +22,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Obtener el código de acción de la URL
+  // Extrae el código de verificación de la URL
   const queryParams = new URLSearchParams(location.search);
   const oobCode = queryParams.get("oobCode");
 
@@ -41,8 +36,7 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Verificar reCAPTCHA
+    // Verifica reCAPTCHA antes de continuar
     const recaptchaValue = recaptchaRef.current.getValue();
     if (!recaptchaValue) {
       toast.error("Por favor, completa el captcha");
@@ -67,7 +61,7 @@ const ResetPassword = () => {
     } catch (error) {
       console.error("Error al restablecer la contraseña:", error);
       let errorMessage = "Error al restablecer la contraseña";
-      
+
       switch (error.code) {
         case "auth/expired-action-code":
           errorMessage = "El enlace ha expirado. Solicita un nuevo enlace.";
@@ -81,7 +75,7 @@ const ResetPassword = () => {
         default:
           errorMessage = "Error al restablecer la contraseña. Intenta nuevamente.";
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);

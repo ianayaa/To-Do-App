@@ -1,7 +1,6 @@
 import { useMemo, useCallback } from 'react';
 
 export function useCalendarEvents(tasks) {
-  // Función para obtener el nombre de clase del evento
   const getEventClassName = useCallback((task) => {
     if (!task) return '';
     
@@ -18,7 +17,6 @@ export function useCalendarEvents(tasks) {
     }
   }, []);
 
-  // Eventos formateados para el calendario completo
   const fullCalendarEvents = useMemo(() => {
     if (!tasks || !Array.isArray(tasks)) return [];
     
@@ -37,7 +35,6 @@ export function useCalendarEvents(tasks) {
     }));
   }, [tasks, getEventClassName]);
 
-  // Eventos formateados para el calendario móvil
   const mobileCalendarEvents = useMemo(() => {
     if (!tasks || !Array.isArray(tasks)) return [];
     

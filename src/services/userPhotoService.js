@@ -1,7 +1,6 @@
 import { doc, updateDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 
-// Función para actualizar la foto del usuario en todos los lugares necesarios
 export const updateUserPhoto = async (db, auth, photoURL) => {
     try {
         const user = auth.currentUser;
@@ -12,16 +11,13 @@ export const updateUserPhoto = async (db, auth, photoURL) => {
             newPhotoURL: photoURL
         });
 
-        // 1. Actualizar en Firebase Auth
         await updateProfile(user, { photoURL });
         console.log('Foto actualizada en Firebase Auth');
 
-        // 2. Actualizar en Firestore users collection
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, { photoURL });
         console.log('Foto actualizada en documento de usuario');
 
-        // 3. Actualizar en todas las tareas compartidas
         const batch = writeBatch(db);
         const tasksSnapshot = await getDocs(collection(db, 'tasks'));
         let updatedCount = 0;

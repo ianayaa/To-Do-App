@@ -12,8 +12,8 @@ import {
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ViewWeekIcon from '@mui/icons-material/ViewWeek';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import AddTask from '../components/tasks/AddTask';
-import TaskList from '../components/tasks/TaskList';
+import AddTask from '../../components/tasks/AddTask';
+import TaskList from '../../components/tasks/TaskList';
 
 const PageTasks = () => {
   const theme = useTheme();

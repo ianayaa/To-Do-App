@@ -343,6 +343,109 @@ select.input-field:hover {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .configuracion-usuario-container {
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background-color: #25283D;
+    min-height: 100vh;
+  }
+
+  .configuracion-content {
+    padding: 1rem;
+    margin-bottom: 70px;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: none;
+  }
+
+  .profile-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .left-column, .right-column {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+  }
+
+  .profile-photo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .settings {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    width: 100%;
+    min-width: 100%;
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.8rem;
+  }
+
+  .input-field {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-section {
+    gap: 0.8rem;
+  }
+
+  /* Ajustes para el selector de teléfono en móvil */
+  .react-tel-input .form-control {
+    width: 100% !important;
+    padding: 0.8rem 0.8rem 0.8rem 50px !important;
+  }
+
+  .react-tel-input .flag-dropdown {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Ajustes para los botones de guardar y cerrar sesión */
+  .save-changes,
+  .logout-button {
+    padding: 0.8rem;
+    margin-top: 0.8rem;
+  }
+}
+
+/* Ajustes específicos para pantallas muy pequeñas */
+@media (max-width: 375px) {
+  .configuracion-content {
+    padding: 0.8rem;
+  }
+
+  .btn {
+    padding: 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .profile-photo {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 768px) {
   .profile-section {
     grid-template-columns: 1fr;
   }

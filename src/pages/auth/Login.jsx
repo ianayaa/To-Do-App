@@ -12,12 +12,13 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserSessionPersistence,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import "../../styles/login.css";
+import "../../styles/pages/login.css";
 import logo from "../../assets/To-Do-Logo.png";
 
 const AppLogin = () => {
@@ -39,13 +40,11 @@ const AppLogin = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
 
-  // Función para validar el email
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Función para calcular la fortaleza de la contraseña
   const calculatePasswordStrength = (password) => {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -62,7 +61,6 @@ const AppLogin = () => {
       }
     });
 
-    // Cargar el correo del último usuario desde localStorage
     const lastEmail = localStorage.getItem("lastEmail");
     if (lastEmail) {
       setCredentials((prev) => ({ ...prev, email: lastEmail }));
@@ -80,11 +78,64 @@ const AppLogin = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const createParticles = () => {
+      const container = document.querySelector('.login-container');
+      if (!container) return;
+
+      const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
+      const particles = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random();
+        
+        if (size < 0.4) {
+          particle.className = 'particle particle-small';
+        } else if (size < 0.7) {
+          particle.className = 'particle particle-medium';
+        } else {
+          particle.className = 'particle particle-large';
+        }
+
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        particle.style.left = `${left}%`;
+        particle.style.top = `${top}%`;
+
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+
+        container.appendChild(particle);
+        particles.push(particle);
+      }
+
+      return () => {
+        particles.forEach(particle => {
+          if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+          }
+        });
+      };
+    };
+
+    const cleanup = createParticles();
+    
+    const handleResize = () => {
+      if (cleanup) cleanup();
+      createParticles();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      if (cleanup) cleanup();
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const togglePanel = (isActive) => {
     if (!isMobile) {
       setIsRightPanelActive(isActive);
     } else {
-      // En móvil, simplemente cambiamos el estado sin animación
       setIsRightPanelActive(isActive);
     }
   };
@@ -174,7 +225,6 @@ const AppLogin = () => {
           errorMessage = "No existe una cuenta con este correo.";
           break;
         case "auth/password-does-not-meet-requirements":
-          // Extraer el mensaje de los requisitos y simplificarlo
           const requirements =
             error.message.match(/\[(.*)\]/)?.[1] ||
             "No cumple con los requisitos de seguridad.";
@@ -208,6 +258,38 @@ const AppLogin = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!credentials.email) {
+      setMessage("Por favor, ingresa tu correo electrónico para restablecer la contraseña.");
+      setErrors(prev => ({ ...prev, email: true }));
+      return;
+    }
+    
+    if (!isValidEmail(credentials.email)) {
+      setMessage("Por favor, ingresa un correo electrónico válido.");
+      setErrors(prev => ({ ...prev, email: true }));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, credentials.email);
+      setMessage("Te hemos enviado un correo con las instrucciones para restablecer tu contraseña.");
+    } catch (error) {
+      let errorMessage;
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No existe una cuenta con este correo.";
+          break;
+        default:
+          errorMessage = "Error al enviar el correo. Inténtalo de nuevo.";
+      }
+      setMessage(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -282,6 +364,13 @@ const AppLogin = () => {
             >
               Iniciar Sesión
             </button>
+            <a
+              href="#"
+              onClick={handleForgotPassword}
+              className="account-option"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
           </form>
         </div>
 

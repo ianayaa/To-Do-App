@@ -14,7 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import useAIChat from "../../hooks/Assistant/useAIChat";
+import useAIChat from "../../../hooks/services/assistant/useAIChat";
 
 const AssistantAI = ({ open, onClose, TaskInfo }) => {
   const apiEndpoint = "https://api.openai.com/v1/chat/completions";

@@ -1,14 +1,17 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+
+/* Importa Font Awesome */
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
 /* importa los archivos css */
-@import "./home.css";
-@import "./login.css";
-@import "./sidebar.css";
-@import "./taskCard.css";
-@import "./taskSummary.css";
-@import "./datepicker.css";
-@import "./taskDialog.css";
+@import "./pages/login.css";
+@import "./pages/home.css";
+@import "./components/layout/sidebar.css";
+@import "./components/layout/task-card.css";
+@import "./components/layout/task-summary.css";
+@import "./components/layout/task-dialog.css";
+@import "./components/inputs/datepicker.css";
+@import "./components/calendar/mobileCalendar.css";
 
 /* Reset global */
 html, body {
@@ -55,4 +58,44 @@ body {
   border: none;
   background-color: #6c757d; /* Color gris para el combobox */
   appearance: none;
+}
+
+/* Estilos para la navegación móvil */
+@media (max-width: 768px) {
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #25283d;
+    padding: 12px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .mobile-nav a {
+    color: #a6a6a6;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .mobile-nav a.active {
+    color: #ffffff;
+  }
+
+  .mobile-nav i {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  /* Ajustar el contenido principal para que no se oculte detrás de la navegación */
+  .main-content {
+    padding-bottom: 70px;
+  }
 }

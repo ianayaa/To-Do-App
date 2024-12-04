@@ -13,6 +13,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   AccessTime as AccessTimeIcon,
+  CalendarMonth
 } from '@mui/icons-material';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
@@ -23,7 +24,7 @@ import {
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import PropTypes from 'prop-types';
-import '../../styles/mobileCalendar.css';
+import "../../styles/components/calendar/mobileCalendar.css";
 
 const MobileCalendar = ({ events, onEventClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -160,59 +161,62 @@ const MobileCalendar = ({ events, onEventClick }) => {
             {getEventsForDate(selectedDate).map((event, index) => (
               <Paper 
                 key={index} 
-                className="event-card"
+                className={`event-card priority-${event.priority?.toLowerCase()}`}
                 onClick={() => onEventClick(event)}
                 elevation={0}
               >
-                <Box className="event-time">
+                <div className="event-time">
                   <AccessTimeIcon fontSize="small" />
-                  <Typography variant="body2">
-                    {format(new Date(event.start), 'HH:mm')}
-                  </Typography>
-                </Box>
+                  {format(new Date(event.start), 'HH:mm')}
+                </div>
+
                 <Typography className="event-title">
                   {event.title}
                 </Typography>
-                <Box className="event-chips">
-                  {event.priority && (
-                    <Box
-                      className="priority-chip"
-                      sx={{ 
-                        backgroundColor: `${getPriorityColor(event.priority)}15`,
-                        color: getPriorityColor(event.priority),
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: '4px 12px',
-                        borderRadius: '16px',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        border: `1px solid ${getPriorityColor(event.priority)}30`
-                      }}
-                    >
-                      {getPriorityIcon(event.priority)}
-                      <span>{event.priority}</span>
-                    </Box>
-                  )}
-                  {event.estado && (
-                    <Box
-                      className="status-chip"
-                      sx={{ 
-                        backgroundColor: `${getStatusColor(event.estado)}15`,
-                        color: getStatusColor(event.estado),
-                      }}
-                    >
-                      {event.estado}
-                    </Box>
-                  )}
-                </Box>
+                
+                {event.descripcion && (
+                  <Typography className="event-description">
+                    {event.descripcion}
+                  </Typography>
+                )}
+
+                {event.estado && (
+                  <Typography className={`status-${event.estado?.toLowerCase().replace(/\s+/g, '')}`}>
+                    {event.estado}
+                  </Typography>
+                )}
               </Paper>
             ))}
           </Stack>
         ) : (
-          <Typography className="no-events-message">
-            No hay eventos para este día
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 1,
+              py: 3
+            }}
+          >
+            <CalendarMonth 
+              sx={{ 
+                color: '#f5f5f5',
+                fontSize: '2rem',
+                mb: 1
+              }} 
+            />
+            <Typography 
+              className="no-events-message" 
+              sx={{ 
+                color: '#f5f5f5',
+                textAlign: 'center',
+                fontSize: '1rem',
+                fontWeight: 400
+              }}
+            >
+              No hay eventos para este día
+            </Typography>
+          </Box>
         )}
       </Box>
     </Paper>
